@@ -1,0 +1,19 @@
++----------------------------------------------------------------------------------------------------------------+
+| [ X CLOSE ]                                                                                       [ < PREV | NEXT > ]
+|                                                                                                                |
+|                                    +----------------------------------------+                                  |
+|                                    |                                        |                                  |
+|                                    |                                        |                                  |
+|                                    |         [ HIGH-RES EXPANDED IMAGE ]    |                                  |
+|                                    |                                        |                                  |
+|                                    |                                        |                                  |
+|                                    +----------------------------------------+                                  |
+|                                                                                                                |
+|                                    "NEON SHADOWS, TOKYO" — 35mm Film Still                                     |
+|                                    Location: Shinjuku, Japan | 2024                                         |
+|                                                                                                                |
++----------------------------------------------------------------------------------------------------------------+
+
+PhotoSwipe v5, opened from the #photography collage wall (see
+"collage photowall.txt"). PREV/NEXT walk photography.json entries in track
+order.

@@ -1,0 +1,30 @@
+SECTION: #about (last section on the single page)
+
+Static content only — no contact form, no viewer input anywhere on the site.
+
++----------------------------------------------------------------------------------------------------------------+
+|                                                                                                                |
+|  +---------------------------------------+   ZAHEDI SHAMS                                                      |
+|  |                                       |   Director of Photography / Cinematographer                         |
+|  |                                       |   ----------------------------------------------------------------  |
+|  |                                       |   Zahedi Shams is an internationally recognized Director of         |
+|  |                                       |   Photography with a foundation built in fine-art still photography.|
+|  |        [ PORTRAIT / BTS PHOTO ]       |   His work spans high-concept commercials and narrative short      |
+|  |        Zahedi on set with camera      |   films characterized by evocative lighting and painterly frame    |
+|  |        package.                       |   compositions.                                                     |
+|  |                                       |                                                                     |
+|  |                                       |   With multiple international awards, Zahedi collaborates with      |
+|  |                                       |   directors across North America, Europe, and Asia.                 |
+|  |                                       |                                                                     |
+|  +---------------------------------------+   REPRESENTATION & CONTACT                                          |
+|                                              ----------------------------------------------------------------  |
+|                                              Commercials / Narrative: Agency Name ( contact@agent.com )       |
+|                                              Direct Inquiry: zahedi@zahedishams.com                             |
+|                                              Location: Available Worldwide                                     |
+|                                                                                                                |
+|                                              [ 📄 DOWNLOAD PRESS KIT / CV (PDF) ]                              |
+|                                                                                                                |
++----------------------------------------------------------------------------------------------------------------+
+
+Content sourced entirely from about.json; bio/representation/press-kit are
+plain text and a static R2-hosted PDF link — nothing here submits anywhere.

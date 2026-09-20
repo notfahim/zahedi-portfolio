@@ -1,0 +1,171 @@
+---
+import { getEntry } from "astro:content";
+
+const about = await getEntry("about", "site");
+const { directInquiryEmail, socials } = about!.data;
+
+/**
+ * Icon per platform, keyed by the label in about.json. A social with no icon
+ * here still renders, falling back to its initial rather than being dropped or
+ * showing an empty button.
+ */
+const ICONS: Record<string, string> = {
+  instagram:
+    "M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.43.43.7.83.91 1.4.17.42.37 1.06.42 2.25.06 1.28.07 1.66.07 4.9s0 3.6-.07 4.9c-.05 1.2-.25 1.8-.42 2.2a3.9 3.9 0 0 1-.9 1.4c-.44.43-.84.7-1.41.91-.42.17-1.06.37-2.25.42-1.28.06-1.66.07-4.9.07s-3.6 0-4.9-.07c-1.2-.05-1.8-.25-2.2-.42a3.9 3.9 0 0 1-1.4-.9 3.9 3.9 0 0 1-.91-1.41c-.17-.42-.37-1.06-.42-2.25C2.21 15.6 2.2 15.2 2.2 12s0-3.6.07-4.9c.05-1.2.25-1.8.42-2.2.22-.6.48-1 .9-1.4.43-.43.83-.7 1.4-.91.42-.17 1.06-.37 2.25-.42C8.4 2.21 8.8 2.2 12 2.2Zm0 1.8c-3.17 0-3.5.01-4.74.07-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.4.4-.66.8-.87 1.35-.16.41-.35 1.03-.4 2.17-.06 1.23-.07 1.6-.07 4.73s.01 3.5.07 4.74c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.4.4.8.66 1.35.87.41.16 1.03.35 2.17.4 1.23.06 1.6.07 4.73.07s3.5-.01 4.74-.07c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.4-.4.66-.8.87-1.35.16-.41.35-1.03.4-2.17.06-1.23.07-1.6.07-4.73s-.01-3.5-.07-4.74c-.05-1.14-.24-1.76-.4-2.17a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.87c-.41-.16-1.03-.35-2.17-.4C15.5 4.01 15.17 4 12 4Zm0 3.06a4.94 4.94 0 1 1 0 9.88 4.94 4.94 0 0 1 0-9.88Zm0 8.15a3.2 3.2 0 1 0 0-6.41 3.2 3.2 0 0 0 0 6.41Zm6.3-8.35a1.15 1.15 0 1 1-2.3 0 1.15 1.15 0 0 1 2.3 0Z",
+  facebook:
+    "M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.1 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.9h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z",
+  email:
+    "M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 2v.5l-8 5.25L4 6.5V6h16ZM4 18V8.84l7.45 4.9a1 1 0 0 0 1.1 0L20 8.84V18H4Z",
+};
+
+const buttons = [
+  ...(socials ?? []).map((s) => ({ label: s.label, url: s.url, external: true })),
+  { label: "Email", url: `mailto:${directInquiryEmail}`, external: false },
+];
+---
+<footer class="site-footer">
+  <ul class="socials">
+    {buttons.map(({ label, url, external }) => (
+      <li>
+        <a
+          href={url}
+          class="social-button"
+          aria-label={label}
+          title={label}
+          rel={external ? "me noopener noreferrer" : undefined}
+          target={external ? "_blank" : undefined}
+        >
+          {ICONS[label.toLowerCase()] ? (
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d={ICONS[label.toLowerCase()]} />
+            </svg>
+          ) : (
+            <span aria-hidden="true">{label.charAt(0)}</span>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+  <p>
+    © 2026 Zahedi Shams. All rights reserved.
+  </p>
+  <p>
+    Representation: <a href={`mailto:${directInquiryEmail}`}>{directInquiryEmail}</a>
+  </p>
+  <p>
+    <a href="#top" class="back-to-top" data-scroll-to>Back to top ↑</a>
+  </p>
+</footer>
+
+<style>
+  .site-footer {
+    padding: 2rem 1.5rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  /* Back to top stays on the right; centring the column would otherwise
+     drag it into the middle under the copyright. */
+  .site-footer > p:last-child {
+    align-self: stretch;
+    margin: 0;
+  }
+
+  .back-to-top {
+    float: right;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    margin-top: -0.4rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .back-to-top:hover {
+    background: color-mix(in srgb, var(--color-fg) 22%, transparent);
+  }
+
+  .back-to-top:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* The social and contact links had no hover state — nothing distinguished
+     them from the grey text around them until the cursor changed. */
+  .site-footer a:not(.back-to-top) {
+    color: var(--color-muted);
+    text-decoration-color: color-mix(in srgb, var(--color-fg) 25%, transparent);
+    text-underline-offset: 0.25em;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+
+  .site-footer a:not(.back-to-top):hover {
+    color: var(--color-fg);
+    text-decoration-color: currentColor;
+  }
+
+  .site-footer a:not(.back-to-top):focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .back-to-top {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .back-to-top:hover {
+    transform: translateY(-2px);
+  }
+
+  .socials {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: 0 0 0.5rem;
+    padding: 0;
+  }
+
+  .social-button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-fg) 10%, transparent);
+    color: var(--color-fg);
+    transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  }
+
+  .social-button svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: currentColor;
+  }
+
+  .site-footer a.social-button:hover {
+    background: var(--color-accent);
+    color: var(--color-bg);
+    transform: translateY(-2px);
+  }
+
+  .site-footer a.social-button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+</style>

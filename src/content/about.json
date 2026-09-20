@@ -1,0 +1,41 @@
+{
+  "site": {
+    "role": "Director of Photography",
+    "bio": "Zahedi Shams is a Director of Photography whose visual language began with street photography, shaping his instinct for real faces, natural light, and moments that feel immediate and alive. His work spans commercials, feature films, short films, documentaries, fashion, and beauty, alongside experience in directing and set design. He is drawn to polished imagery, expressive faces, rich colour, and cinematic storytelling with a distinct sense of character. His understanding of contemporary cinematography allows him to work confidently across different visual environments, from carefully controlled beauty and commercial shoots to more intimate narrative work.",
+    "representation": [
+      {
+        "label": "Commercials / Narrative",
+        "contact": "zahedishams@gmail.com"
+      }
+    ],
+    "directInquiryEmail": "zahedishams@gmail.com",
+    "location": "Available Worldwide",
+    "heroImageKey": "about/hero",
+    "heroImageWidths": [
+      640,
+      1280,
+      1920
+    ],
+    "portraitKey": "about/portrait",
+    "portraitWidths": [
+      640,
+      1280,
+      1920
+    ],
+    "portraitAlt": "Zahedi Shams on set",
+    "reelVimeoId": "000000001",
+    "reelVimeoHash": "placeholder1",
+    "reelTitle": "Reel 2026",
+    "whatsappNumber": "+880 1844-000334",
+    "socials": [
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/zahedi_shams/"
+      },
+      {
+        "label": "Facebook",
+        "url": "https://www.facebook.com/sohaeb.zahedi"
+      }
+    ]
+  }
+}

@@ -1,0 +1,177 @@
+---
+import { mediaUrl, derivativeUrl, derivativeSrcSet, pickWidth } from "../../lib/r2-url";
+import { categoryLabel } from "../../lib/work-categories";
+
+interface Props {
+  slug: string;
+  title?: string;
+  category?: string;
+  year?: number;
+  /**
+   * The credit fields. Every card carries all of them; the viewer shows the
+   * ones this category asks for (see shared/work-categories.mjs).
+   */
+  client?: string;
+  director?: string;
+  producer?: string;
+  runtime?: string;
+  artist?: string;
+  thumbnailKey?: string;
+  thumbnailWidths?: number[];
+  hoverPreviewKey?: string;
+  videoKey?: string;
+}
+const { slug, title, category, year, client, director, producer, runtime, artist, thumbnailKey, thumbnailWidths, hoverPreviewKey, videoKey } = Astro.props;
+/**
+ * The slug is the only thing a project always has, so it stands in for a title
+ * not yet written — an untitled card would be a thumbnail with nothing under it.
+ */
+const heading = title ?? slug;
+/** Built from whatever exists; with neither part, the line does not render. */
+const credit = [categoryLabel(category), year].filter(Boolean).join(" | ");
+/**
+ * Whoever the card names under its title: a music video leads with its artist,
+ * everything else with its director, and a documentary credits nobody here.
+ */
+const lead = category === "music-video" ? artist && `${artist}` : director && `Dir. ${director}`;
+---
+<article class="project-card" data-work-card={category ?? ""} data-reveal>
+  <button
+    type="button"
+    class="thumb-button"
+    aria-label={videoKey ? `Play ${heading}` : `Show ${heading}`}
+    aria-expanded="false"
+    data-project-expand
+    data-video-key={videoKey}
+    data-project-title={title}
+    data-project-client={client}
+    data-project-category={category}
+    data-project-year={year}
+    data-project-director={director}
+    data-project-producer={producer}
+    data-project-runtime={runtime}
+    data-project-artist={artist}
+  >
+    <div class="thumb-wrap" data-media>
+      {thumbnailKey && (
+        <picture>
+          <source type="image/avif" srcset={derivativeSrcSet(thumbnailKey, "avif", thumbnailWidths)} sizes="(min-width: 60rem) 45vw, 90vw" />
+          <source type="image/webp" srcset={derivativeSrcSet(thumbnailKey, "webp", thumbnailWidths)} sizes="(min-width: 60rem) 45vw, 90vw" />
+          <img src={derivativeUrl(thumbnailKey, pickWidth(1280, thumbnailWidths), "webp")} alt={heading} loading="lazy" />
+        </picture>
+      )}
+      {hoverPreviewKey && (
+        <video src={mediaUrl(hoverPreviewKey)} muted loop playsinline preload="none"></video>
+      )}
+    </div>
+  </button>
+  <h3>{heading}</h3>
+  <p>{[lead, credit].filter(Boolean).join(" | ")}</p>
+
+</article>
+
+<style>
+  .project-card {
+    transition: opacity 0.35s ease;
+  }
+
+  /* A project is open: fade the others back so the open one reads as the
+     subject. The open card keeps its thumbnail and its place. */
+  :global(.work-grid-open) .project-card:not(.is-active) {
+    opacity: 0.32;
+  }
+
+  .project-card.is-active :global(.thumb-wrap) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .thumb-button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  /* The card lifts under the cursor and its title warms, so a thumbnail with
+     no preview clip still answers the pointer. */
+  .thumb-wrap {
+    transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+      box-shadow 0.35s ease;
+  }
+
+  .thumb-button:hover .thumb-wrap,
+  .thumb-button:focus-visible .thumb-wrap {
+    transform: translateY(-4px);
+    box-shadow: 0 0.9rem 2rem color-mix(in srgb, #000 45%, transparent);
+  }
+
+  .project-card h3 {
+    transition: color 0.2s ease;
+  }
+
+  .project-card:hover h3 {
+    color: var(--color-accent);
+  }
+
+  @media (hover: none) {
+    .thumb-button:hover .thumb-wrap {
+      transform: none;
+      box-shadow: none;
+    }
+    .project-card:hover h3 {
+      color: inherit;
+    }
+  }
+
+  .thumb-button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .thumb-wrap {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+  /* The poster image and the hover clip must occupy the SAME box, or they
+     won't cross-fade cleanly — the wrapper is locked to 16/9 while source
+     thumbnails may not be, so both need object-fit: cover, not just the
+     video. (`picture` is an unpositioned inline wrapper, so the img's
+     containing block is .thumb-wrap itself.) */
+  .thumb-wrap img,
+  .thumb-wrap video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+  .thumb-wrap video {
+    opacity: 0;
+  }
+  .thumb-wrap:hover video {
+    opacity: 1;
+  }
+  /* :has(video) is load-bearing. Without it, a project with no hover clip
+     faded its still to nothing on hover and the card went blank. */
+  .thumb-wrap:has(video):hover img {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
+    const video = card.querySelector("video");
+    if (!video) return;
+    card.addEventListener("pointerenter", () => {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    });
+    card.addEventListener("pointerleave", () => video.pause());
+  });
+</script>

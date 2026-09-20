@@ -1,0 +1,27 @@
+OVERVIEW — how the per-section wireframes assemble into the single page
+(src/pages/index.astro). Each section file below now shows only its own
+content; the header/footer chrome is global and drawn once, not per-section.
+
+  [ HEADER — state 1: centered title card ]         <- see header.txt
+        |
+        v
+  #work        — hero loop + "Play Reel" + category-filtered project grid
+        |          -> see "recent work.txt"
+        |          -> scrolling past this point morphs the header into
+        |             state 2 (fixed top bar with nav) — see header.txt
+        v
+  #photography — fixed full-viewport pannable collage wall
+        |          -> see "collage photowall.txt"
+        |          -> click a photo: "photo lightbox.txt" (PhotoSwipe v5)
+        v
+  #news        — awards & press, two columns
+        |          -> see "features.txt"
+        v
+  #about       — bio, representation, press-kit link (static, no form)
+        |          -> see "about.txt"
+        v
+  [ FOOTER — social links, copyright, back-to-top ]  <- see footer.txt
+
+Nav (#work / #photography / #news / #about) scroll-to-anchor via Lenis.
+Clicking a Work card or "Play Reel" opens "video lightbox.txt" regardless of
+scroll position — it's an overlay, not a step in this flow.

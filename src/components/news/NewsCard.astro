@@ -1,0 +1,35 @@
+---
+interface Props {
+  type: "press" | "podcast";
+  year: number;
+  title: string;
+  org: string;
+  project?: string;
+  link?: string;
+}
+const { type, year, title, org, project, link } = Astro.props;
+const icon = type === "press" ? "📰" : "🎙️";
+const linkLabel = type === "podcast" ? "Listen ↗" : "Read Feature ↗";
+---
+<div class="news-card">
+  <p class="headline">{icon} {year} — {title}</p>
+  <p class="meta">{org} {project && `— Project: ${project}`}</p>
+  {link && <a href={link} target="_blank" rel="noopener noreferrer">{linkLabel}</a>}
+</div>
+
+<style>
+  .news-card {
+    padding: 1rem 0;
+    /* Token-derived, not a hand-decomposed copy of --color-fg, so the rule
+       follows the palette. */
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+  }
+  .headline {
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+  }
+  .meta {
+    color: var(--color-muted);
+    margin: 0 0 0.25rem;
+  }
+</style>

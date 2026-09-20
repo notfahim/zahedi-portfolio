@@ -1,0 +1,40 @@
+SECTION: #photography — fixed full-viewport-height (100vh) panel, NOT a
+normal vertically-flowing grid. Contains one horizontally-scrolling collage
+"track" wider than the viewport, clipped by the panel.
+
++----------------------------------------------------------------------------------------------------------------+
+|  PHOTOGRAPHY                                                                                                   |
+|  Selected Stills, Visual Experiments & On-Set Frame Grabs                                                      |
+|  ------------------------------------------------------------------------------------------------------------  |
+|                                                                                                                |
+|   <-- auto-pan direction (ping-pong; reverses at each end) -->                                                 |
+|  +-------------------+  +-----------+  +-------------------+  +-----------------------+  +-------------------+ |
+|  |                   |  | [PHOTO 2] |  |                   |  |                       |  |                   | |
+|  |    [ PHOTO 1 ]    |  | 16:9      |  |    [ PHOTO 3 ]    |  |     [ PHOTO 5 ]       |  |    [ PHOTO 7 ]    | |
+|  |    4:5, tall      |  +-----------+  |    2:3            |  |     2.39:1 wide       |  |    4:5, tall      | |
+|  |                   |  | [PHOTO 4] |  |                   |  |                       |  |                   | |
+|  +-------------------+  +-----------+  +-------------------+  +-----------------------+  +-------------------+ |
+|                          [ PHOTO 6 ]                                                       [ PHOTO 8 ]         |
+|  ... track continues further than one screen width, scrolls horizontally ...                                   |
+|                                                                                                                |
+|  ================================================================================================ [ scrollbar ] |
++----------------------------------------------------------------------------------------------------------------+
+
+Layout: CSS Grid collage (grid-auto-flow: column -- not dense, varied grid-row
+span per tile) — no JS masonry library, tiles vary in size/aspect for the
+collage look, populated from photography.json.
+
+Idle behavior: while no pointer is over the panel, it auto-pans slowly and
+steadily, reversing direction at each end (ping-pong, not an infinite loop).
+Disabled entirely under prefers-reduced-motion.
+
+On hover: pointer entering the panel immediately pauses the auto-pan and
+hands control to the visitor — real overflow-x scroll (wheel / trackpad /
+drag / the scrollbar shown above all work). A photo click opens the photo
+lightbox (see "photo lightbox.txt"). Auto-pan resumes a short delay after
+the pointer leaves.
+
+The panel opts out of the page's Lenis smooth-scroll (data-lenis-prevent)
+so its nested horizontal scroll doesn't fight the page's vertical scroll.
+
+No category filter in v1 — one continuous wall.

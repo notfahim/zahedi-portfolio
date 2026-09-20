@@ -1,0 +1,88 @@
+---
+import { getEntry } from "astro:content";
+import { mediaUrl, derivativeUrl, derivativeSrcSet, pickWidth } from "../../lib/r2-url";
+import { whatsappUrl } from "../../lib/contact";
+
+const about = await getEntry("about", "site");
+const { bio, representation, directInquiryEmail, whatsappNumber, location, pressKitKey, portraitKey, portraitWidths, portraitAlt } = about!.data;
+---
+<section id="about" class="about-section">
+  <div class="portrait" data-media data-reveal>
+    <picture>
+      <source type="image/avif" srcset={derivativeSrcSet(portraitKey, "avif", portraitWidths)} sizes="(min-width: 48rem) 24rem, 90vw" />
+      <source type="image/webp" srcset={derivativeSrcSet(portraitKey, "webp", portraitWidths)} sizes="(min-width: 48rem) 24rem, 90vw" />
+      <img src={derivativeUrl(portraitKey, pickWidth(1280, portraitWidths), "webp")} alt={portraitAlt} loading="lazy" />
+    </picture>
+  </div>
+  <div class="copy">
+    <h2>Zahedi Shams</h2>
+    <p class="role">Director of Photography / Cinematographer</p>
+    <p class="bio">{bio}</p>
+
+    <h3>Representation &amp; Contact</h3>
+    <ul class="representation">
+      {representation.map((r) => (
+        <li>
+          {r.label}:{" "}
+          {/* The contact line is free text — an address, an agency, a phone
+              number. Only make it a link when it is actually an email. */}
+          {r.contact.includes("@") ? (
+            <a href={`mailto:${r.contact}`}>{r.contact}</a>
+          ) : (
+            r.contact
+          )}
+        </li>
+      ))}
+      <li>
+        Direct Inquiry:{" "}
+        {whatsappNumber ? (
+          <a href={whatsappUrl(whatsappNumber)} target="_blank" rel="noopener noreferrer">
+            {whatsappNumber} (WhatsApp)
+          </a>
+        ) : (
+          <a href={`mailto:${directInquiryEmail}`}>{directInquiryEmail}</a>
+        )}
+      </li>
+      <li>Location: {location}</li>
+    </ul>
+
+{pressKitKey && (
+      <a class="press-kit" href={mediaUrl(pressKitKey)} target="_blank" rel="noopener noreferrer">
+        📄 Download Press Kit / CV (PDF)
+      </a>
+    )}
+  </div>
+</section>
+
+<style>
+  .about-section {
+    display: grid;
+    grid-template-columns: minmax(0, 24rem) 1fr;
+    gap: 3rem;
+    padding: 4rem 1.5rem;
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+  /* Only as tall as the photograph. As a grid item it stretched to the row's
+     height while the image kept its own, and the difference showed up as a
+     band of the [data-media] skeleton background under the picture. */
+  .portrait {
+    align-self: start;
+  }
+  .role {
+    color: var(--color-muted);
+  }
+  .representation {
+    list-style: none;
+    padding: 0;
+  }
+  .press-kit {
+    display: inline-block;
+    margin-top: 1.5rem;
+  }
+  @media (max-width: 48rem) {
+    .about-section {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

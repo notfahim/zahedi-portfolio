@@ -1,0 +1,40 @@
+{
+  "site": {
+    "film": {
+      "title": "The Pair of White Pigeons",
+      "year": 2025,
+      "role": "Director of Photography",
+      "posterKey": "news/pairpigeons-poster",
+      "posterWidths": [
+        640
+      ],
+      "posterAlt": "Poster for The Pair of White Pigeons"
+    },
+    "accolades": [
+      {
+        "result": "win",
+        "title": "Best Camera",
+        "org": "Mari International Ethnic Film Festival",
+        "year": 2026
+      },
+      {
+        "result": "selection",
+        "title": "Official Selection",
+        "org": "XXI Kazan International Film Festival ‘Altyn Minbar’",
+        "year": 2025
+      },
+      {
+        "result": "selection",
+        "title": "Final Selection",
+        "org": "Nepal International Film Festival",
+        "year": 2026
+      },
+      {
+        "result": "selection",
+        "title": "Opening Film",
+        "org": "Clapham International Film Festival",
+        "year": 2025
+      }
+    ]
+  }
+}

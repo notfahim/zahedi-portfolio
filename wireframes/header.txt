@@ -1,0 +1,26 @@
+STATE 1 — ON LOAD (centered title card, no nav visible)
++----------------------------------------------------------------------------------------------------------------+
+|                                                                                                                |
+|                                                                                                                |
+|                                          ZAHEDI SHAMS                                                          |
+|                                     [DOP / CINEMATOGRAPHER]                                                    |
+|                                                                                                                |
+|                                                                                                                |
++----------------------------------------------------------------------------------------------------------------+
+
+STATE 2 — AFTER SCROLLING PAST THE WORK HERO (fixed top bar, morph via GSAP ScrollTrigger)
++----------------------------------------------------------------------------------------------------------------+
+|         WORK        PHOTOGRAPHY                    ZAHEDI SHAMS                    NEWS & PRESS      ABOUT    |
+|                                                 [DOP / CINEMATOGRAPHER]                                        |
++----------------------------------------------------------------------------------------------------------------+
+                                                        ^^^^ current section's nav item underlined/highlighted
+
+Name stays centered in both states (matches the reference design) — it
+doesn't relocate to the left on scroll, only shrinks/compacts in place.
+Nav splits into two groups flanking it, reading left-to-right as WORK,
+PHOTOGRAPHY, [name], NEWS & PRESS, ABOUT — same left-to-right order as
+before, just interrupted by the centered name instead of trailing it.
+
+Nav links scroll-to-anchor (#work / #photography / #news / #about) on the
+single page via Lenis. State 2 stays pinned for the rest of the scroll;
+the highlighted nav item tracks whichever section is in view.

@@ -1,0 +1,36 @@
+SECTION: #work (first section on the single page, sits under the header's
+centered STATE 1 — see header.txt)
+
++----------------------------------------------------------------------------------------------------------------+
+|                                                                                                                |
+|  +----------------------------------------------------------------------------------------------------------+  |
+|  |                                                                                                          |  |
+|  |                              [ HERO LOOP — self-hosted, silent, capped-res ]                             |  |
+|  |                                        (2.39:1 Cinema Ratio)                                             |  |
+|  |                                                                                                          |  |
+|  |   ZAHEDI SHAMS — DIRECTOR OF PHOTOGRAPHY                                                                 |  |
+|  |   [ ▶ PLAY REEL (2026) ]  -- opens video lightbox, mounts Vimeo facade only then                         |  |
+|  |                                                                                                          |  |
+|  +----------------------------------------------------------------------------------------------------------+  |
+|                                                                                                                |
+|                                                                                                                |
+|  CATEGORY FILTER:   ( ALL )   /   [ COMMERCIALS ]   /   [ SHORT FILMS ]                                        |
+|  ------------------------------------------------------------------------------------------------------------  |
+|                                                                                                                |
+|  +--------------------------------------------+    +--------------------------------------------+              |
+|  | [ THUMBNAIL 1 - 16:9 / 2.39:1 ]            |    | [ THUMBNAIL 2 - 16:9 / 2.39:1 ]            |              |
+|  | Hover: self-hosted silent preview clip      |    | Hover: self-hosted silent preview clip      |              |
+|  +--------------------------------------------+    +--------------------------------------------+              |
+|  NIKE — "THE SILENT SPRINT"                        THE LAST ECHO (SHORT FILM)                                  |
+|  Dir. Alex Vance | Commercial | 2025               Dir. Sofia Rossi | Official Selection Cannes '25            |
+|                                                                                                                |
+|  +--------------------------------------------+    +--------------------------------------------+              |
+|  | [ THUMBNAIL 3 - 16:9 / 2.39:1 ]            |    | [ THUMBNAIL 4 - 16:9 / 2.39:1 ]            |              |
+|  +--------------------------------------------+    +--------------------------------------------+              |
+|  SAMSUNG — "SHADOWS & LIGHT"                       NOCTURNE (SHORT FILM)                                       |
+|  Dir. Marcus Chen | Commercial | 2025              Dir. Zahedi Shams | Winner Best Cinematography           |
+|                                                                                                                |
++----------------------------------------------------------------------------------------------------------------+
+
+Clicking a card or PLAY REEL opens the video lightbox (see video lightbox.txt),
+which is the only point the Vimeo facade iframe gets mounted.

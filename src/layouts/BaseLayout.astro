@@ -1,0 +1,29 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+import "../styles/global.css";
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {/* Inline and before the body: the fade-in and reveal starting states
+        apply only when scripting is available to undo them. Written here
+        rather than in a module so there is no frame where the page is
+        visible and then hidden again. */}
+    <script is:inline>
+      document.documentElement.classList.add("js-pending");
+      // Right-click on an image only. Anywhere else keeps its menu, so
+      // Back, Reload and Inspect still work.
+      document.addEventListener("contextmenu", (e) => {
+        if (e.target instanceof HTMLImageElement) e.preventDefault();
+      });
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

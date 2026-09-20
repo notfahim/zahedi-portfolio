@@ -1,0 +1,176 @@
+---
+import { getCollection } from "astro:content";
+import PhotoTile from "../photography/PhotoTile.astro";
+
+const photos = await getCollection("photography");
+
+/**
+ * How many of the wall's three rows a photo occupies. Taller photos take more,
+ * wide ones fewer, which keeps a panorama from becoming a narrow sliver and a
+ * portrait from becoming a postage stamp; the tile's width then follows from
+ * its aspect ratio (see PhotoTile.astro).
+ *
+ * The tall threshold is 1.2 rather than 1.3 because a 4:5 portrait — the most
+ * common portrait crop — is ratio 1.25, and would otherwise fall into the
+ * medium bucket and flatten the collage exactly where photography is most
+ * likely to be portrait.
+ */
+function rowSpanFor(width: number, height: number): number {
+  const ratio = height / width;
+  if (ratio >= 1.2) return 3; // tall
+  if (ratio <= 0.6) return 1; // very wide
+  return 2; // roughly square/landscape
+}
+---
+<section id="photography" class="photography-section">
+  <div class="heading">
+    <h2>Photography</h2>
+    <p>Selected Stills, Visual Experiments &amp; On-Set Frame Grabs</p>
+  </div>
+
+  <div class="wall-frame">
+    <button type="button" class="wall-arrow prev" data-wall-prev aria-label="Scroll left" hidden>
+      <span aria-hidden="true">‹</span>
+    </button>
+    <button type="button" class="wall-arrow next" data-wall-next aria-label="Scroll right" hidden>
+      <span aria-hidden="true">›</span>
+    </button>
+    <div class="photo-wall-viewport" data-photo-wall data-lenis-prevent>
+    <div class="photo-wall-track" data-photo-wall-track>
+      {photos.map((photo) => (
+        <PhotoTile
+          imageKey={photo.data.imageKey}
+          width={photo.data.width}
+          height={photo.data.height}
+          caption={photo.data.caption}
+          location={photo.data.location}
+          year={photo.data.year}
+          camera={photo.data.camera}
+          rowSpan={rowSpanFor(photo.data.width, photo.data.height)}
+          widths={photo.data.widths}
+        />
+      ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .photography-section {
+    /* Taller than the screen by --wall-extra: at exactly one screen the
+       wall was short enough that a column holding two tall photographs was
+       already under the target column width, so it never took a third.
+       Every column runs three deep now. */
+    --wall-extra: 5rem;
+    height: calc(100vh + var(--wall-extra)); /* fallback for browsers without dvh support */
+    height: calc(100dvh + var(--wall-extra));
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem 1.5rem;
+  }
+  .heading {
+    flex: none;
+    /* Tight: every pixel here is a pixel of photograph, and the wall is
+       already taller than the screen. */
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .wall-frame {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+  }
+
+  /* Large, obvious, and over the wall rather than beside it, so it does not
+     steal width from the photographs. Hidden by JS at each end. */
+  .wall-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    /* Above a hovered tile, which lifts itself to 2. At the same z-index the
+       tile won on document order and swallowed the arrow exactly when the
+       cursor was on its way to press it. */
+    z-index: 5;
+    appearance: none;
+    border: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-bg) 78%, transparent);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .wall-arrow[hidden] {
+    display: none;
+  }
+
+  .wall-arrow:hover {
+    background: color-mix(in srgb, var(--color-fg) 22%, transparent);
+  }
+
+  .wall-arrow:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .wall-arrow.prev {
+    left: 0.5rem;
+  }
+
+  .wall-arrow.next {
+    right: 0.5rem;
+  }
+
+  .photo-wall-viewport {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+  .photo-wall-viewport::-webkit-scrollbar {
+    height: 6px;
+  }
+  .photo-wall-viewport::-webkit-scrollbar-thumb {
+    background: var(--color-muted);
+  }
+  /* A row of columns, each built by photo-wall-layout.ts and sized so its
+     photos exactly fill the wall's height. The ragged gaps came from the
+     previous approach, which dropped photos into fixed row spans and left
+     whatever space did not divide evenly. */
+  .photo-wall-track {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0.75rem;
+    height: 100%;
+    width: max-content;
+  }
+
+  .photo-wall-track :global(.photo-column) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: none;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { initPhotoWallLayout } from "../../scripts/photo-wall-layout";
+  import { initPhotoWallNav } from "../../scripts/photo-wall-nav";
+  initPhotoWallLayout();
+  initPhotoWallNav();
+</script>
+
+<script>
+  import { initPhotoLightbox } from "../../scripts/photo-lightbox";
+  initPhotoLightbox();
+</script>

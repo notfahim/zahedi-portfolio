@@ -1,0 +1,21 @@
++----------------------------------------------------------------------------------------------------------------+
+| [ X CLOSE ]                                                                                                    |
+|                                                                                                                |
+|        +----------------------------------------------------------------------------------------------+        |
+|        |                                                                                              |        |
+|        |                                   [ FULL-SCREEN VIDEO PLAYER ]                                |        |
+|        |                              (Vimeo facade — private/unlisted link-hash)                     |        |
+|        |                                                                                              |        |
+|        +----------------------------------------------------------------------------------------------+        |
+|                                                                                                                |
+|        PROJECT: NIKE — "THE SILENT SPRINT"                                                                     |
+|        DIRECTOR: Alex Vance  |  DOP: Zahedi Shams  |  COLORIST: Sam Ellis                                    |
+|        CAMERA: Arri Alexa Mini LF + Cooke Anamorphic Lenses                                                    |
+|        AWARDS: Cannes Lions 2025 - Gold (Cinematography)                                                       |
+|                                                                                                                |
++----------------------------------------------------------------------------------------------------------------+
+
+The Vimeo <iframe> is constructed and inserted by JS only when this lightbox
+opens (never present in the page's initial HTML) and is unmounted — stopping
+playback — when it closes. Known gap: Free/Basic Vimeo has no domain lock,
+so a leaked link-hash could be re-embedded elsewhere (accepted, see spec §8).

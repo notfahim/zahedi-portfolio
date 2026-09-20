@@ -1,0 +1,191 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import NewsCard from "../news/NewsCard.astro";
+import { derivativeUrl, derivativeSrcSet, pickWidth } from "../../lib/r2-url";
+import { groupAccolades } from "../../lib/accolades";
+
+const recognition = await getEntry("recognition", "site");
+const { film, accolades } = recognition!.data;
+const { wins, nominations, selections } = groupAccolades(accolades);
+/**
+ * The three accolade lists, written once: what was won, what it was up for,
+ * and where it played.
+ *
+ * `lead` is which half is set in bold on the first line. For an award the
+ * prize is the point — Best Camera, then who gave it. For a selection the
+ * festival is the point, so the two swap.
+ */
+const accoladeGroups = [
+  { heading: "Awards", items: wins, lead: "title" },
+  { heading: "Nominations", items: nominations, lead: "title" },
+  { heading: "Official Selections", items: selections, lead: "org" },
+] as const;
+
+/** Awards belong to the featured film above; this collection is press. */
+const press = await getCollection("news");
+---
+<section id="news" class="news-section">
+  <div class="heading">
+    <h2>News &amp; Recognition</h2>
+    <p>Festival selections, accolades, press features, and periodic updates.</p>
+  </div>
+
+  {film && (
+    <div class="film">
+      <div class="poster" data-media data-reveal>
+        <picture>
+          <source
+            type="image/avif"
+            srcset={derivativeSrcSet(film.posterKey, "avif", film.posterWidths)}
+            sizes="(min-width: 48rem) 22rem, 70vw"
+          />
+          <source
+            type="image/webp"
+            srcset={derivativeSrcSet(film.posterKey, "webp", film.posterWidths)}
+            sizes="(min-width: 48rem) 22rem, 70vw"
+          />
+          <img
+            src={derivativeUrl(film.posterKey, pickWidth(1280, film.posterWidths), "webp")}
+            alt={film.posterAlt}
+            loading="lazy"
+          />
+        </picture>
+      </div>
+
+      <div class="film-copy" data-reveal>
+        <h3 class="film-title">{film.title}</h3>
+        <p class="film-meta">
+          {film.year}{film.role && <span class="sep"> // </span>}{film.role}
+        </p>
+        {film.logline && <p class="logline">{film.logline}</p>}
+
+        {accoladeGroups.map(({ heading, items, lead }) => items.length > 0 && (
+          <div class="accolades">
+            <h4>{heading}</h4>
+            <ul>
+              {items.map((a) => (
+                <li>
+                  <span class="accolade-lead">{lead === "org" ? a.org : a.title}</span>
+                  <span class="accolade-sub">{lead === "org" ? a.title : a.org}, {a.year}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {press.length > 0 && (
+    <div class="press">
+      <h3>Press &amp; Features</h3>
+      {press.map((entry) => (
+        <NewsCard
+          type={entry.data.type}
+          year={entry.data.year}
+          title={entry.data.title}
+          org={entry.data.org}
+          project={entry.data.project}
+          link={entry.data.link}
+        />
+      ))}
+    </div>
+  )}
+</section>
+
+<style>
+  .news-section {
+    padding: 4rem 1.5rem;
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+  .heading {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .film {
+    display: grid;
+    grid-template-columns: minmax(0, 22rem) 1fr;
+    gap: 3rem;
+    align-items: start;
+    padding-bottom: 3rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 12%, transparent);
+  }
+  .poster img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .film-title {
+    font-family: var(--font-display);
+    /* Larger than the "Other Achievements" heading below it — this film is
+       the subject of the section, not one list among several. */
+    font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+    line-height: 1.15;
+    margin: 0 0 0.5rem;
+  }
+  .film-meta {
+    color: var(--color-muted);
+    margin: 0 0 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+  /* The separator is decorative — it must not be read out between the year
+     and the credit. */
+  .sep {
+    opacity: 0.5;
+  }
+  .logline {
+    margin: 0 0 2rem;
+    max-width: 44ch;
+  }
+
+  .accolades + .accolades {
+    margin-top: 1.75rem;
+  }
+  .accolades h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .accolades ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .accolades li {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+  }
+  .accolade-lead {
+    display: block;
+    font-weight: 600;
+  }
+  .accolade-sub {
+    display: block;
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
+  /* Press is the only column now that the achievements list is gone, so it
+     is a plain block — but capped, because a full-width line of small text
+     across a desktop window is unreadable. */
+  .press {
+    max-width: 48rem;
+  }
+
+  @media (max-width: 48rem) {
+    .film {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .poster {
+      max-width: 18rem;
+    }
+  }
+</style>

@@ -1,0 +1,150 @@
+@import "@fontsource/montserrat/400.css";
+@import "@fontsource/montserrat/500.css";
+@import "@fontsource/montserrat/600.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "./tokens.css";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+/* Keep anchor-scrolled sections clear of the fixed header bar. */
+#work,
+#photography,
+#news,
+#about {
+  scroll-margin-top: var(--header-height-compact);
+}
+
+/* ---- Page load ------------------------------------------------------- */
+
+/* The first screen fades in once the scripts have run, so the page arrives
+   composed rather than snapping from an unstyled flash into place. The
+   starting state is written on <html> by reveal.ts; without JS the class is
+   never added, so this rule must not be the thing that makes content
+   visible — only the thing that softens its arrival. */
+body {
+  opacity: 1;
+}
+
+html.js-pending body {
+  opacity: 0;
+}
+
+html.is-ready body {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* ---- Reveal on scroll ------------------------------------------------ */
+
+[data-reveal] {
+  opacity: 1;
+}
+
+html.js-pending [data-reveal] {
+  opacity: 0;
+  transform: translateY(1.25rem);
+}
+
+html.js-pending [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---- Image skeletons -------------------------------------------------- */
+
+/* The wrapper holds the shimmer; the image fades in over it once decoded.
+   Sized by whatever the wrapper already is, so it never changes layout. */
+[data-media] {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--color-fg) 6%, var(--color-bg));
+}
+
+[data-media]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-fg) 7%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+[data-media].is-loaded::after {
+  /* Removed, not just faded: an infinite animation on every tile is work the
+     page does forever otherwise. */
+  content: none;
+}
+
+[data-media] img {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+[data-media].is-loaded img {
+  opacity: 1;
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.is-ready body,
+  html.js-pending [data-reveal].is-revealed,
+  [data-media] img {
+    transition-duration: 0.01ms;
+  }
+  [data-media]::after {
+    animation: none;
+  }
+}
+
+/* Images are not meant to be lifted off the page. This stops the drag and
+   the long-press "Save Image" sheet; the right-click menu is stopped in
+   BaseLayout. None of it protects the file — the URL is still in the
+   network tab — it only removes the one-gesture save. */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}

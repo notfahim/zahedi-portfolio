@@ -1,0 +1,168 @@
+<div class="video-lightbox" data-video-lightbox data-lenis-prevent hidden>
+  <button type="button" class="close" data-video-close aria-label="Close">✕ Close</button>
+  <div class="layout">
+    <div class="frame" data-video-frame-slot></div>
+    <aside class="details">
+      <h2 data-video-title></h2>
+      <div class="detail-list" data-video-details></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  import { initVideoLightbox } from "../../scripts/video-lightbox";
+  initVideoLightbox();
+</script>
+
+<style>
+  .video-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    /* Token-derived rather than a literal, so the backdrop follows the
+       palette (see the same treatment on the Work hero scrim). */
+    /* Opaque: at 96% the page behind stayed legible through it — the fixed
+       header in particular read straight over the video. */
+    background: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 4vw, 3rem);
+  }
+
+  /* REQUIRED — do not drop. The `hidden` attribute only hides via the UA
+     stylesheet's `[hidden] { display: none }`, which an author `display:
+     flex` rule above outranks. Without this, the lightbox renders visible
+     on page load as a full-viewport overlay covering the whole site. */
+  .video-lightbox[hidden] {
+    display: none;
+  }
+
+  /* Video on the left, reading matter on the right. The video column takes
+     whatever is left after the text column, so the player is as large as the
+     screen allows rather than boxed to a fixed width. */
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    /* Top-aligned so the title sits level with the top edge of the video
+       rather than floating at its vertical centre. */
+    align-items: start;
+    width: 100%;
+    max-width: 96rem;
+  }
+
+  .frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+
+  .frame video {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .details h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    /* Optical alignment: the cap height starts slightly below the box top,
+       so a small negative nudge levels it with the video's top edge. */
+    margin: -0.25rem 0 1.25rem;
+  }
+
+  /* The dashed rule separating the title from the facts. */
+  .detail-list {
+    border-top: 1px dashed color-mix(in srgb, var(--color-fg) 28%, transparent);
+    padding-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  /* :global — these rows are created by video-lightbox.ts at click time, so
+     they never receive Astro's scoping attribute and scoped selectors miss
+     them entirely (labels and values ran together without this). */
+  .detail-list :global(.detail-lead) {
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .detail-list :global(.detail-row) {
+    display: grid;
+    /* Fixed label column so the values line up as a column of their own. */
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .detail-list :global(.detail-label) {
+    color: var(--color-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding-top: 0.2rem;
+  }
+
+  .detail-list :global(.detail-value) {
+    color: var(--color-fg);
+  }
+
+  .close {
+    position: absolute;
+    top: clamp(1rem, 3vw, 2rem);
+    right: clamp(1rem, 3vw, 2rem);
+    appearance: none;
+    border: 0;
+    background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+    color: var(--color-fg);
+    font: inherit;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .close:hover {
+    background: color-mix(in srgb, var(--color-fg) 20%, transparent);
+  }
+
+  .close:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Narrow screens cannot show two columns: the video goes on top and the
+     text below it, and the pair scrolls if it does not fit. */
+  @media (max-width: 60rem) {
+    .video-lightbox {
+      align-items: flex-start;
+      overflow-y: auto;
+    }
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      padding-top: 3.5rem;
+    }
+    .detail-list :global(.detail-row) {
+      grid-template-columns: 7rem minmax(0, 1fr);
+    }
+  }
+</style>

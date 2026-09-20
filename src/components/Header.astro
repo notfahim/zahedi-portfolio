@@ -1,0 +1,492 @@
+---
+import { getEntry } from "astro:content";
+
+const about = await getEntry("about", "site");
+const role = about!.data.role ?? "Director of Photography";
+---
+{/* Sits outside the header's own transform so it stays pinned to the very
+    top of the window while the header's contents ride up and down. */}
+<div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="nav-group nav-left">
+      <a href="#work" data-nav="work" data-scroll-to>Work</a>
+      <span class="sep" aria-hidden="true">//</span>
+      <a href="#photography" data-nav="photography" data-scroll-to>Photography</a>
+    </div>
+    <div class="title-block">
+      <h1 class="name"><a href="#top" data-scroll-to>Zahedi Shams</a></h1>
+      <p class="role">{role}</p>
+    </div>
+    <div class="nav-group nav-right">
+      <a href="#news" data-nav="news" data-scroll-to>News &amp; Press</a>
+      <span class="sep" aria-hidden="true">//</span>
+      <a href="#about" data-nav="about" data-scroll-to>About</a>
+    </div>
+  </div>
+
+  {/* Outside .header-inner: that row is pushed down the screen on the
+      landing page, which would put the menu button in the middle of it. The
+      button belongs in the top bar at all times. */}
+  <button
+    type="button"
+    class="menu-toggle"
+    data-menu-toggle
+    aria-expanded="false"
+    aria-controls="mobile-menu"
+    aria-label="Open menu"
+  >
+    <span class="bar" aria-hidden="true"></span>
+    <span class="bar" aria-hidden="true"></span>
+  </button>
+</header>
+
+{/* One list rather than the header's two groups: stacked in a panel there is
+    no left and right to flank anything. */}
+<nav class="menu-panel" id="mobile-menu" data-menu-panel data-lenis-prevent aria-label="Sections">
+  <a href="#work" data-scroll-to>Work</a>
+  <a href="#photography" data-scroll-to>Photography</a>
+  <a href="#news" data-scroll-to>News &amp; Press</a>
+  <a href="#about" data-scroll-to>About</a>
+</nav>
+
+<script>
+  import { initScrollEngine } from "../scripts/scroll";
+  import { initMobileMenu } from "../scripts/mobile-menu";
+  import { initReveal } from "../scripts/reveal";
+  import { initImageLoading } from "../scripts/image-loading";
+  initScrollEngine();
+  initMobileMenu();
+  initReveal();
+  initImageLoading();
+</script>
+
+<style>
+  /* The header is always the compact bar at the top of the screen. What
+     moves is its contents: on load they are pushed down (--header-y) so the
+     name sits in the middle of the first screen, and the title is drawn
+     larger (--title-scale). scroll.ts updates both as the page scrolls —
+     the contents hold their place until the Work filter buttons reach them,
+     then ride up with those buttons, shrinking as they go, until they settle
+     into the bar. These defaults are the expanded state, so the first paint
+     is correct before any script runs. */
+  .site-header {
+    --bar: var(--header-height-compact);
+    --header-y: calc(50vh - var(--bar) / 2);
+    --header-y: calc(50svh - var(--bar) / 2);
+    /* Expanded size = .name's font-size x this. Deliberately larger than
+       any screen can grant: scroll.ts caps it at the clear run between the
+       nav links, so the opening name fills the width available rather than
+       stopping at a number chosen for one window size. */
+    --title-scale: 3.4;
+    --nav-unit: clamp(0.55rem, 1.2vw, 1rem);
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 100;
+    height: var(--bar);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+    /* Transparent chrome must not eat clicks on whatever sits beneath it —
+       only the interactive children opt back in. */
+    pointer-events: none;
+  }
+
+  .nav-group,
+  .title-block {
+    pointer-events: auto;
+  }
+
+  /* A three-column grid, not a flex row: the outer tracks are forced equal
+     with minmax(0, 1fr), so the name stays centred on the page even when one
+     side's links are wider than the other's. In a flex row the wider side
+     pushed the name off centre as the window narrowed. */
+  .header-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(0.75rem, 2.5vw, 2.5rem);
+    width: 100%;
+    max-width: 64rem;
+    transform: translateY(var(--header-y));
+    will-change: transform;
+  }
+
+  .nav-group {
+    display: flex;
+    align-items: center;
+    /* Without this a flex item refuses to shrink below its content width,
+       which is how the outer links ended up off-screen. */
+    min-width: 0;
+    gap: 1rem;
+    /* Grows as the title shrinks. --nav-progress runs 0 (opening, title
+       large) to 1 (bar, title small) and is set by scroll.ts, so the two move
+       in opposite directions instead of one staying put. */
+    /* Fluid unit, so the bar narrows with the window rather than pushing
+       its outer links past the edge. */
+    font-size: calc((0.85 + 0.5 * var(--nav-progress, 1)) * var(--nav-unit));
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .nav-left {
+    justify-self: start;
+  }
+
+  .nav-group a {
+    text-decoration: none;
+    /* A wrapped link ("NEWS & / PRESS") breaks the bar's single line. */
+    white-space: nowrap;
+    opacity: 0.85;
+    /* Space for the underline the active link draws, reserved on every link
+       so nothing shifts when the active section changes. */
+    padding-bottom: 0.15em;
+    border-bottom: 0.08em solid transparent;
+    transition: opacity 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  /* Hover shows a faint version of the underline the active section gets,
+     so the link reads as the same kind of thing before it is clicked. */
+  .nav-group a:hover {
+    opacity: 1;
+    border-bottom-color: color-mix(in srgb, var(--color-fg) 35%, transparent);
+  }
+
+  /* Over the hero, where the links sit on a photograph rather than a solid
+     bar, a hovered link lights up. Dropped once the header has settled into
+     the bar: against flat colour a glow reads as a blur. */
+  :global(html:not(.header-compact)) .nav-group a:hover {
+    color: var(--color-fg);
+    text-shadow:
+      0 0 0.6em color-mix(in srgb, var(--color-fg) 70%, transparent),
+      0 0 1.4em color-mix(in srgb, var(--color-accent) 55%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--color-accent) 70%, transparent);
+  }
+
+  .nav-group a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .menu-toggle:hover .bar {
+    background: var(--color-accent);
+  }
+
+  .menu-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* A real element, not an ::after on the link. Generated content sits
+     inside the link's box, so the active link's underline ran beneath the
+     separator too. */
+  .sep {
+    font-size: calc((0.85 + 0.5 * var(--nav-progress, 1)) * var(--nav-unit));
+    color: var(--color-muted);
+    opacity: 0.5;
+    font-weight: 400;
+    user-select: none;
+  }
+
+  .nav-right {
+    justify-content: flex-end;
+    justify-self: end;
+  }
+
+  /* Scaled rather than re-flowed: the bar-sized title is the layout size, and
+     the large opening title is the same box drawn bigger around its centre,
+     so resizing it never shifts the links beside it. */
+  .title-block {
+    /* Pinned to the middle track. Below 42rem both .nav-group siblings are
+       display: none, so auto-placement dropped the name into column 1 and it
+       hung off the left edge of a phone screen. */
+    grid-column: 2;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    transform: scale(var(--title-scale));
+    will-change: transform;
+  }
+
+  /* Sits under the name, and out of the flow: while it occupied layout
+     height the name sat off the centre line the nav links align to — most
+     visibly in the bar, where the role has faded to nothing but its space
+     remained. */
+  .role {
+    position: absolute;
+    top: 100%;
+    /* Centred on the name's centre line, not fitted to the name's box. The
+       title block is only as wide as the name, and on a phone this line is
+       wider than that — pinned left:0/right:0 it had nowhere to centre into,
+       so it started at the block's left edge and ran off to the right. */
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    opacity: var(--role-opacity, 1);
+    /* Shrinks on a narrow screen, where the name shrinks but this line, sized
+       in rem, would not — and it is the wider of the two. */
+    font-size: clamp(0.38rem, 1.7vw, 0.5rem);
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    /* Letter-spacing leaves a gap after the LAST letter too, pulling the ink
+       half a space off centre. Half the spacing puts it back — a full one
+       overshot by the same amount in the other direction. */
+    text-indent: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+    margin: 0.35rem 0 0;
+  }
+
+  .name a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .name a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 0.15em;
+  }
+
+  .name {
+    font-family: var(--font-display);
+    /* Sized against the bar and the nav beside it, and fluid so a narrow
+       window shrinks it rather than letting it collide with the links. */
+    font-size: clamp(1.15rem, 2.6vw, 2rem);
+    font-weight: 500;
+    line-height: 1;
+    margin: 0;
+  }
+
+  :global(.header-compact) .site-header {
+    /* Token-derived so it follows the palette, not a literal. */
+    background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  /* The section currently in view.
+
+     Written as `.nav-group a[data-nav].active`, not `[data-nav].active`:
+     Astro scopes the base rule to `.nav-group[cid] a[cid]`, whose specificity
+     (0,3,1) beats a lone `[cid][data-nav].active` (0,3,0) — so the plain
+     selector lost to its own base rule and the underline stayed transparent
+     while the colour, set only here, worked. */
+  .nav-group a[data-nav].active {
+    color: var(--color-accent);
+    opacity: 1;
+    border-bottom-color: var(--color-accent);
+  }
+
+  /* Narrow screens: the links sit below the name while it is large, and
+     beside it once it reaches the bar. That swap is a layout change, not a
+     transform, so it happens at the moment the title arrives. */
+  /* Below this the single row gets tight enough that a link wraps and the
+     name crowds it, so the bar stacks instead: name over links. */
+  /* Small phones: the two sides plus the name only fit if both shrink
+     further than the general fluid range allows. */
+  @media (max-width: 26rem) {
+    .site-header {
+      --nav-unit: clamp(0.46rem, 2.3vw, 1rem);
+      /* Every pixel of side padding here is a pixel the three columns do not
+         have. */
+      padding: 0 0.6rem;
+    }
+    .header-inner {
+      gap: 0.45rem;
+    }
+    .name {
+      font-size: clamp(0.95rem, 4.4vw, 2rem);
+    }
+    .nav-group {
+      letter-spacing: 0.04em;
+    }
+  }
+
+  /* Portrait and narrow windows keep the desktop arrangement — links either
+     side of the name — but each side stacks its own two links so the row
+     still fits. */
+  /* Below this the four links become a menu button. Two stacked columns
+     either side of the name fitted, but each link had to shrink to about
+     7px to do it — legible only in the sense that it rendered. */
+  @media (max-width: 42rem) {
+    .site-header {
+      --title-scale: 2.2;
+    }
+    .header-inner {
+      gap: 0.75rem;
+    }
+    .nav-group {
+      display: none;
+    }
+  }
+
+  /* ---- Scroll progress ------------------------------------------------ */
+
+  .scroll-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 2px;
+    z-index: 120;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--color-fg) 8%, transparent);
+    /* Nothing to indicate until the reader has somewhere to go. */
+    opacity: var(--progress-opacity, 0);
+    transition: opacity 0.3s ease;
+  }
+
+  .scroll-progress span {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--color-accent);
+    /* scaleX rather than width: a transform does not force layout on every
+       scroll frame. */
+    transform: scaleX(var(--scroll-progress, 0));
+    transform-origin: left center;
+  }
+
+  /* ---- Mobile menu ---------------------------------------------------- */
+
+  .menu-toggle {
+    display: none;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0.6rem;
+    cursor: pointer;
+    pointer-events: auto;
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+  }
+
+  .menu-toggle .bar {
+    display: block;
+    width: 1.5rem;
+    height: 2px;
+    background: var(--color-fg);
+    transition: transform 0.3s ease, opacity 0.2s ease;
+  }
+
+  .menu-toggle .bar + .bar {
+    margin-top: 0.4rem;
+  }
+
+  /* The two bars become the cross that closes the panel. */
+  :global(.menu-open) .menu-toggle .bar:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  :global(.menu-open) .menu-toggle .bar:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  /* Below the header (see .site-header's raised z-index while open), so the
+     button that opened it is still the button that closes it. */
+  .menu-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    background: color-mix(in srgb, var(--color-bg) 97%, transparent);
+    backdrop-filter: blur(12px);
+    /* Kept in the layout so the links can animate; taken out of reach with
+       inert and pointer-events while closed. */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+
+  :global(.menu-open) .menu-panel {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.3s ease, visibility 0s;
+  }
+
+  .menu-panel a {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 8vw, 2.4rem);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+    text-decoration: none;
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition: opacity 0.35s ease, transform 0.35s ease, color 0.2s ease;
+  }
+
+  :global(.menu-open) .menu-panel a {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Staggered, so the list arrives as a sequence rather than a block. */
+  :global(.menu-open) .menu-panel a:nth-child(1) { transition-delay: 0.06s; }
+  :global(.menu-open) .menu-panel a:nth-child(2) { transition-delay: 0.12s; }
+  :global(.menu-open) .menu-panel a:nth-child(3) { transition-delay: 0.18s; }
+  :global(.menu-open) .menu-panel a:nth-child(4) { transition-delay: 0.24s; }
+
+  .menu-panel a:hover,
+  .menu-panel a:focus-visible {
+    color: var(--color-accent);
+  }
+
+  /* The panel takes focus when it opens, so the first link shows a ring
+     immediately — the site's own ring rather than the browser's blue. */
+  .menu-panel a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 0.4rem;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu-panel,
+    .menu-panel a,
+    .menu-toggle .bar {
+      transition-duration: 0.01ms;
+    }
+  }
+
+  /* After .menu-toggle's own `display: none` above — two rules of equal
+     specificity resolve on order, and this one has to be the later. */
+  @media (max-width: 42rem) {
+    .menu-toggle {
+      display: block;
+    }
+  }
+
+  /* The header sits at 100 normally, which is under the open panel — the
+     close button was painted behind the thing it closes, leaving Escape and
+     tapping a link as the only ways out. */
+  :global(.menu-open) .site-header {
+    z-index: 115;
+  }
+
+  /* With the header raised above the panel, its contents would be too — on
+     the landing page the name sits mid-screen and landed on top of the menu
+     items. Only the button stays. */
+  :global(.menu-open) .header-inner,
+  /* The children too: .title-block and .nav-group set pointer-events: auto on
+     themselves, which beat the inherited none and left the invisible name and
+     role catching the taps aimed at the menu links behind them. */
+  :global(.menu-open) .header-inner .title-block,
+  :global(.menu-open) .header-inner .nav-group {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+</style>

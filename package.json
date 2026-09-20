@@ -1,0 +1,38 @@
+{
+  "name": "zahedi-portfolio",
+  "version": "1.0.0",
+  "description": "Portfolio site for Zahedi Shams, Director of Photography.",
+  "author": "Kh. Fahim Shahriar (https://github.com/notfahim)",
+  "license": "MIT",
+  "repository": "github:notfahim/zahedi-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "publish-image": "node scripts/publish-image.mjs",
+    "publish-video": "node scripts/publish-video.mjs",
+    "publish-folder": "node scripts/publish-folder.mjs",
+    "check-media": "node scripts/check-media.mjs"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.1.0",
+    "@fontsource/montserrat": "^5.3.0",
+    "astro": "^5.0.0",
+    "lenis": "^1.1.14",
+    "photoswipe": "^5.4.4",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@aws-sdk/client-s3": "^3.658.0",
+    "@types/node": "^22.0.0",
+    "sharp": "^0.33.5",
+    "typescript": "^5.6.0",
+    "vercel": "^59.23.2",
+    "vitest": "^2.1.0"
+  }
+}

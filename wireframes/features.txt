@@ -1,0 +1,31 @@
+SECTION: #news ("News & Press" in the nav; third section on the single page)
+
+No newsletter signup — static content only, sourced from news.json.
+
++----------------------------------------------------------------------------------------------------------------+
+|                                                                                                                |
+|  NEWS & RECOGNITION                                                                                            |
+|  Press features, festival selections, accolades, and periodic updates.                                         |
+|  ------------------------------------------------------------------------------------------------------------  |
+|                                                                                                                |
+|  +---------------------------------------------------+  +---------------------------------------------------+  |
+|  | AWARDS & RECOGNITIONS                             |  | PRESS & FEATURES                                  |  |
+|  | ------------------------------------------------- |  | ------------------------------------------------- |  |
+|  |                                                   |  |                                                   |  |
+|  |  🏆 2025 — BEST CINEMATOGRAPHY                    |  |  📰 BRITISH CINEMATOGRAPHER MAGAZINE              |  |
+|  |  International Short Film Festival Berlin         |  |  "Mastering Low Light: Zahedi Shams on 'Echoes'"  |  |
+|  |  Project: "The Last Echo"                         |  |  [ Read Feature ↗ ]                               |  |
+|  |                                                   |  |                                                   |  |
+|  |  🏆 2024 — CANNES LIONS (GOLD)                    |  |  📰 SHOTDECK FEATURED DOP                         |  |
+|  |  Best Visual Craft / Lighting                     |  |  Color Palettes and Composition in Commercials    |  |
+|  |  Project: Nike Campaign                           |  |  [ Read Feature ↗ ]                               |  |
+|  |                                                   |  |                                                   |  |
+|  |  🏆 2023 — ASC HERITAGE AWARD NOMINEE             |  |  🎙️ THE CINEMATOGRAPHY PODCAST                    |  |
+|  |  Spotlight Category                               |  |  Episode 142: Transitioning from Stills to DOP    |  |
+|  |                                                   |  |  [ Listen ↗ ]                                     |  |
+|  +---------------------------------------------------+  +---------------------------------------------------+  |
+|                                                                                                                |
++----------------------------------------------------------------------------------------------------------------+
+
+Each entry (award/press/podcast) is a small static card built from a
+news.json record; "Read Feature"/"Listen" links point off-site.

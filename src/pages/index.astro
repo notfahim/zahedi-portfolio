@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WorkSection from "../components/sections/WorkSection.astro";
+import PhotographySection from "../components/sections/PhotographySection.astro";
+import NewsSection from "../components/sections/NewsSection.astro";
+import AboutSection from "../components/sections/AboutSection.astro";
+import VideoLightbox from "../components/lightbox/VideoLightbox.astro";
+---
+<BaseLayout title="Zahedi Shams — Director of Photography">
+  <Header />
+  <main>
+    <WorkSection />
+    <PhotographySection />
+    <NewsSection />
+    <AboutSection />
+  </main>
+  <Footer />
+  <VideoLightbox />
+</BaseLayout>

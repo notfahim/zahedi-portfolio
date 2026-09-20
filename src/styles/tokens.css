@@ -1,0 +1,23 @@
+:root {
+  --color-bg: #1c1c1e;
+  --color-fg: #f5f4f0;
+  --color-muted: #8a8a86;
+  --color-accent: #c9a24b;
+
+  /* Montserrat carries the name in the header and every title. */
+  --font-display: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Inter", -apple-system, sans-serif;
+
+  /* The compact bar. Doubled from 4.5rem so the nav has room to breathe;
+     section scroll-margin follows this token, so anchors stay clear of it. */
+  /* Sized to the text it holds — the 2rem name plus breathing room. A taller
+     bar left obvious empty bands above and below the words. */
+  --header-height-compact: 4rem;
+}
+
+/* The narrow bar holds two stacked links either side of the name. Section scroll-margin follows the same token. */
+@media (max-width: 42rem) {
+  :root {
+    --header-height-compact: 5rem;
+  }
+}

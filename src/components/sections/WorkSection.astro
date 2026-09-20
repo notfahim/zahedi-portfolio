@@ -1,0 +1,594 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import { mediaUrl, derivativeUrl, derivativeSrcSet, pickWidth } from "../../lib/r2-url";
+import ProjectCard from "../work/ProjectCard.astro";
+import { WORK_CATEGORIES, categoryCounts } from "../../lib/work-categories";
+
+const projects = await getCollection("work");
+const about = await getEntry("about", "site");
+const { heroImageKey, heroImageWidths, heroLoopKey, reelVideoKey, reelTitle } = about!.data;
+/**
+ * The reel is its own site-level field, not "whichever project happens to be
+ * first in work.json": showing the reel button must not silently borrow
+ * another project's credits under the reel's title.
+ */
+const hasReel = Boolean(reelVideoKey);
+/**
+ * How much work each category holds. An empty one keeps its button, so the
+ * range of work on offer stays visible, but the button is disabled.
+ */
+const counts = categoryCounts(projects.map((p) => p.data));
+/**
+ * One group per category, in the order shared/work-categories.mjs lists them,
+ * and only the ones that hold work — an empty group would print a heading and
+ * a rule over nothing.
+ */
+const groups = WORK_CATEGORIES.filter((category) => counts[category.id] > 0).map((category) => ({
+  category,
+  projects: projects.filter((p) => p.data.category === category.id),
+}));
+/**
+ * A project filed under no category is still work, and trails the groups
+ * rather than being dropped: the schema lets `category` be missing, so this is
+ * a state the content can legitimately be in.
+ */
+const ungrouped = projects.filter(
+  (p) => !p.data.category || !(p.data.category in counts)
+);
+---
+<section id="top" class="hero-section">
+  <div class="hero">
+    {heroImageKey ? (
+      <picture>
+        <source type="image/avif" srcset={derivativeSrcSet(heroImageKey, "avif", heroImageWidths)} sizes="100vw" />
+        <source type="image/webp" srcset={derivativeSrcSet(heroImageKey, "webp", heroImageWidths)} sizes="100vw" />
+        {/* Eager, not lazy: this is the first thing on screen. Empty alt
+            because it is decorative — the name over it is the content. */}
+        <img class="hero-media" src={derivativeUrl(heroImageKey, pickWidth(1920, heroImageWidths), "webp")} alt="" fetchpriority="high" />
+      </picture>
+    ) : heroLoopKey ? (
+      <video class="hero-media" src={mediaUrl(heroLoopKey)} autoplay muted loop playsinline></video>
+    ) : null}
+    <div class="hero-copy">
+      {/* No heading here: the site's <h1> is the name in the fixed header,
+          which sits centred over this hero on load. A second copy of the
+          name would print it twice on the first screen. */}
+      {hasReel && (
+        <button
+          type="button"
+          class="reel-button"
+          data-header-push
+          data-video-trigger
+          data-video-key={reelVideoKey}
+          data-project-title={reelTitle}
+        >
+          <span class="reel-icon" aria-hidden="true">▶</span> Play Reel
+        </button>
+      )}
+    </div>
+  </div>
+
+</section>
+
+<section id="work" class="work-section">
+  {/* data-header-push, not just the filter bar below: the header holds its
+      centred position until the topmost marked element reaches it, so
+      whatever comes FIRST under the hero has to carry the mark. Marking only
+      the filter bar let this heading slide under the opening name. */}
+  <div class="heading" data-header-push>
+    <h2>Work</h2>
+    <p>Selected Commercials, Short Films &amp; Collaborations</p>
+  </div>
+
+  {/* Jump links, not filters: the grid shows every category at once, so the
+      bar's job is to say which one you are in and take you to another. An
+      empty category is a <span>, not a link — the range of work on offer
+      still reads, but there is nowhere to go. */}
+  <nav class="filter-bar" data-header-push aria-label="Work categories">
+    {WORK_CATEGORIES.map((category) =>
+      counts[category.id] === 0 ? (
+        <span aria-disabled="true" title={`No ${category.plural.toLowerCase()} yet`}>
+          {category.plural}
+        </span>
+      ) : (
+        <a href={`#work-${category.id}`} data-scroll-to data-work-jump={category.id}>
+          {category.plural}
+        </a>
+      )
+    )}
+  </nav>
+
+  {/* One panel for the whole grid. work-expand.ts moves it directly after the
+      last card of the row that was clicked, so the thumbnails keep their
+      places and only the rows below are pushed down. */}
+  <div class="work-viewer" data-work-viewer hidden>
+    <div class="viewer-inner">
+      <div class="viewer-video" data-video-slot></div>
+      <aside class="viewer-details">
+        <h3 data-viewer-title></h3>
+        <div class="detail-list" data-details></div>
+        <button type="button" class="collapse" data-collapse>✕ Close</button>
+      </aside>
+    </div>
+  </div>
+
+  {/* Still ONE grid, with the group headings as full-width children rather
+      than a grid per category: work-expand.ts finds the clicked card's row by
+      comparing offsetTops across the grid, and a grid per group would give it
+      five separate coordinate systems to reconcile. */}
+  <div class="grid" data-work-grid>
+    {groups.map(({ category, projects: inGroup }) => (
+      <Fragment>
+        <div class="category-head" id={`work-${category.id}`} data-work-group={category.id}>
+          <h3>{category.plural}</h3>
+        </div>
+        {inGroup.map((project) => (
+          <ProjectCard
+            slug={project.data.slug}
+            title={project.data.title}
+            category={project.data.category}
+            year={project.data.year}
+            client={project.data.client}
+            director={project.data.director}
+            producer={project.data.producer}
+            runtime={project.data.runtime}
+            artist={project.data.artist}
+            thumbnailKey={project.data.thumbnailKey}
+            thumbnailWidths={project.data.thumbnailWidths}
+            hoverPreviewKey={project.data.hoverPreviewKey}
+            videoKey={project.data.videoKey}
+          />
+        ))}
+      </Fragment>
+    ))}
+    {ungrouped.length > 0 && (
+      <Fragment>
+        <div class="category-head" id="work-other" data-work-group="other">
+          <h3>Other Work</h3>
+        </div>
+        {ungrouped.map((project) => (
+          <ProjectCard
+            slug={project.data.slug}
+            title={project.data.title}
+            category={project.data.category}
+            year={project.data.year}
+            client={project.data.client}
+            director={project.data.director}
+            producer={project.data.producer}
+            runtime={project.data.runtime}
+            artist={project.data.artist}
+            thumbnailKey={project.data.thumbnailKey}
+            thumbnailWidths={project.data.thumbnailWidths}
+            hoverPreviewKey={project.data.hoverPreviewKey}
+            videoKey={project.data.videoKey}
+          />
+        ))}
+      </Fragment>
+    )}
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    position: relative;
+  }
+  .hero {
+    position: relative;
+    /* Fills the first screen so the expanded header has something to sit
+       over, and so the morph fires after exactly one screen of scrolling.
+       The video keeps its cinematic framing via object-fit: cover. */
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  /* Absolutely filled so the photo or video covers the whole first screen
+     whatever its own proportions — the hero is sized by min-height, which
+     an in-flow child's percentage height cannot resolve against. */
+  .hero-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-copy {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* The name is centred here by the header; the reel button sits below it
+       rather than under it. */
+    justify-content: flex-end;
+    padding-bottom: 6rem;
+    gap: 1rem;
+    text-align: center;
+    /* Derived from the token, not a hand-copied literal, so the scrim
+       follows --color-bg if the palette changes. */
+    background: color-mix(in srgb, var(--color-bg) 65%, transparent);
+  }
+  /* Sticky for the length of the Work section only: it is a child of
+     <section id="work">, so it rides under the header past the grid and
+     leaves with the section when the photo wall arrives. No script, no
+     second bar — the containing block does the work. Below the header
+     (z-index 100) and above the cards. */
+  .filter-bar {
+    position: sticky;
+    top: var(--header-height-compact);
+    z-index: 90;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    margin-bottom: 1.25rem;
+    padding: 0.9rem 1.5rem;
+    /* Opaque enough that a thumbnail scrolling under it does not muddle the
+       labels, translucent enough to read as a layer over the page. */
+    background: color-mix(in srgb, var(--color-bg) 90%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+  }
+
+  /* Links and, for an empty category, a plain span — styled as one set of
+     pills so the disabled one still reads as part of the row. */
+  .filter-bar a,
+  .filter-bar span {
+    appearance: none;
+    display: inline-block;
+    text-decoration: none;
+    /* An outline on every button, so the row reads as a set of controls
+       rather than a line of captions. */
+    border: 1px solid color-mix(in srgb, var(--color-fg) 20%, transparent);
+    background: transparent;
+    color: color-mix(in srgb, var(--color-fg) 78%, transparent);
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.25rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .filter-bar a:hover {
+    color: var(--color-fg);
+    border-color: color-mix(in srgb, var(--color-fg) 45%, transparent);
+  }
+
+  /* A category with nothing in it yet. Present, so the range of work on
+     offer still reads, but plainly not a control: dimmed, no hover response,
+     and the browser's default arrow cursor rather than a pointer. */
+  .filter-bar span {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  /* Six pills wrapped to three rows on a phone, and a sticky bar three rows
+     tall eats a fifth of the screen. One row that scrolls sideways instead.
+     Lenis reads vertical gestures only, so a wheel here still scrolls the
+     page. */
+  @media (max-width: 42rem) {
+    .filter-bar {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-inline: 1rem;
+    }
+    .filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .filter-bar a,
+    .filter-bar span {
+      flex: 0 0 auto;
+    }
+  }
+
+  /* The chosen category is the accent pill — the one place on the page that
+     colour is spent, so which filter is on is readable at a glance. */
+  .filter-bar a.active {
+    color: var(--color-bg);
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .filter-bar a:focus-visible,
+  .reel-button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .reel-button {
+    appearance: none;
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+    backdrop-filter: blur(8px);
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .reel-button:hover {
+    background: color-mix(in srgb, var(--color-fg) 20%, transparent);
+  }
+
+  .reel-icon {
+    font-size: 0.6rem;
+  }
+  /* Three per row on a wide screen, two then one as it narrows. Fixed track
+     counts rather than auto-fill: a single project must not stretch across
+     the viewport, and an expanded card needs a known row to span. */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+    padding: 0 1.5rem 4rem;
+    max-width: 96rem;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* The band that opens each group: the name on the left, a rule running out
+     to the far edge of the grid. Spans every column so the line is the full
+     width whatever the column count. */
+  .category-head {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    /* Where a jump link lands this heading: clear of the fixed header and of
+       the sticky bar that sits under it. Lenis reads scroll-margin-top, so
+       this is the whole mechanism — see work-nav.ts, which lines its probe up
+       with the same edge. */
+    scroll-margin-top: calc(var(--header-height-compact) + 4.5rem);
+  }
+
+  /* Not on the first one: the bar already sits above it. */
+  .category-head:not(:first-child) {
+    margin-top: 2.5rem;
+  }
+
+  .category-head h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-fg);
+    white-space: nowrap;
+  }
+
+  .category-head::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid color-mix(in srgb, var(--color-fg) 22%, transparent);
+  }
+
+  @media (max-width: 70rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 45rem) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .work-section {
+    padding-top: 4rem;
+  }
+
+  /* Spans every column so it reads as a band under the row it belongs to.
+
+     It slides open by animating a grid row from 0fr to 1fr rather than by
+     animating height: the panel's height depends on the video's aspect ratio
+     and the number of credit rows, and `height: auto` is not a value CSS can
+     transition from. The 0fr/1fr pair gets the same result in every current
+     browser without the height having to be measured in script. */
+  .work-viewer {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    padding: 0;
+    transition: grid-template-rows 380ms cubic-bezier(0.22, 0.61, 0.36, 1),
+      opacity 260ms ease, padding 380ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .work-viewer.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    padding: 1.5rem 0 0.5rem;
+  }
+
+  .work-viewer[hidden] {
+    display: none;
+  }
+
+  .viewer-inner {
+    display: grid;
+    /* Wider than before: at 14-20rem the credits were a narrow strip with
+       the rest of the column empty. */
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 26rem);
+    gap: clamp(1rem, 2.5vw, 2.5rem);
+    /* Stretch, not start: the credits column is then as tall as the video,
+       which is what lets the list inside it spread down the frame. */
+    align-items: stretch;
+    /* Both required for the 0fr row to actually collapse: a grid item's
+       default min-height is its content, and the overflow is what hides the
+       content while the row is shorter than it. */
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .work-viewer {
+      transition: none;
+    }
+  }
+
+  .viewer-video {
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+
+  .viewer-video :global(video),
+  .viewer-video :global(img) {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* A stills-only project opens on its own image, which is not necessarily
+     16/9 — letterbox it rather than crop the frame. */
+  .viewer-video :global(img) {
+    object-fit: contain;
+  }
+
+  .viewer-details {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .viewer-details h3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.2vw, 2.15rem);
+    font-weight: 600;
+    line-height: 1.15;
+    margin: -0.25rem 0 1.1rem;
+  }
+
+  .viewer-details .detail-list {
+    border-top: 1px dashed color-mix(in srgb, var(--color-fg) 28%, transparent);
+    padding-top: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    /* Takes the height the video leaves and shares it between the rows, so
+       the credits run the depth of the frame rather than huddling under the
+       title. space-between rather than a fixed gap, because how many rows
+       there are depends on how fully the project is credited. */
+    flex: 1;
+    justify-content: space-between;
+    gap: 0.35rem;
+  }
+
+  /* :global — built by work-expand.ts at click time, so these never carry
+     Astro's scoping attribute. */
+  .detail-list :global(.detail-lead) {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.3rem;
+  }
+
+  /* Stacked, not side by side: a 7.5rem label column started every value a
+     third of the way across, which is where most of the empty space came
+     from. Label over value gives the name that matters the full width. */
+  .detail-list :global(.detail-row) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-fg) 9%, transparent);
+    line-height: 1.3;
+  }
+
+  .detail-list :global(.detail-row:last-child) {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .detail-list :global(.detail-label) {
+    color: var(--color-muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .detail-list :global(.detail-value) {
+    font-size: clamp(1rem, 1.15vw, 1.2rem);
+    font-weight: 500;
+  }
+
+  /* An unfilled field still holds its line, so the rows stay evenly spaced
+     whether or not a project has been fully credited. */
+  .detail-list :global(.detail-value:empty)::before {
+    content: "—";
+    color: color-mix(in srgb, var(--color-fg) 28%, transparent);
+  }
+
+  .collapse {
+    appearance: none;
+    border: 0;
+    align-self: flex-start;
+    margin-top: 1.5rem;
+    background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+    color: var(--color-fg);
+    font: inherit;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .collapse:hover {
+    background: color-mix(in srgb, var(--color-fg) 20%, transparent);
+  }
+
+  .collapse:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 60rem) {
+    .viewer-inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Centred to sit over the filter bar below it, which has always been
+     centred — left-aligned, the two read as belonging to different
+     layouts. */
+  .work-section .heading {
+    max-width: 96rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+
+  .work-section .heading h2 {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    margin: 0 0 0.35rem;
+  }
+
+  .work-section .heading p {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+  }
+</style>
+
+<script>
+  import { initWorkExpand } from "../../scripts/work-expand";
+  import { initWorkNav } from "../../scripts/work-nav";
+  initWorkExpand();
+  initWorkNav();
+</script>
