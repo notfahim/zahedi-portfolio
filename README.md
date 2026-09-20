@@ -1,5 +1,7 @@
 # Zahedi Shams — Portfolio
 
+Live at **[zahedishams.com](https://zahedishams.com)**.
+
 The portfolio website for **Zahedi Shams, Director of Photography /
 cinematographer**. One long page (`src/pages/index.astro`) with four sections —
 Work, Photography, News & Press, About — plus a 404. Astro 5, static output,
