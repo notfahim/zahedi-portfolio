@@ -1,6 +1,5 @@
 ---
 import { mediaUrl, derivativeUrl, derivativeSrcSet, pickWidth } from "../../lib/r2-url";
-import { categoryLabel } from "../../lib/work-categories";
 
 interface Props {
   slug: string;
@@ -27,13 +26,6 @@ const { slug, title, category, year, client, director, producer, runtime, artist
  * not yet written — an untitled card would be a thumbnail with nothing under it.
  */
 const heading = title ?? slug;
-/** Built from whatever exists; with neither part, the line does not render. */
-const credit = [categoryLabel(category), year].filter(Boolean).join(" | ");
-/**
- * Whoever the card names under its title: a music video leads with its artist,
- * everything else with its director, and a documentary credits nobody here.
- */
-const lead = category === "music-video" ? artist && `${artist}` : director && `Dir. ${director}`;
 ---
 <article class="project-card" data-work-card={category ?? ""} data-reveal>
   <button
@@ -66,8 +58,6 @@ const lead = category === "music-video" ? artist && `${artist}` : director && `D
     </div>
   </button>
   <h3>{heading}</h3>
-  <p>{[lead, credit].filter(Boolean).join(" | ")}</p>
-
 </article>
 
 <style>

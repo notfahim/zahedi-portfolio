@@ -37,18 +37,21 @@ const ungrouped = projects.filter(
 );
 ---
 <section id="top" class="hero-section">
+  {/* Sized to the whole section (hero + fade strip below), not just the
+      first screen, so the photo bleeds past the fold instead of cutting off
+      exactly where the Work heading begins. */}
+  {heroImageKey ? (
+    <picture>
+      <source type="image/avif" srcset={derivativeSrcSet(heroImageKey, "avif", heroImageWidths)} sizes="100vw" />
+      <source type="image/webp" srcset={derivativeSrcSet(heroImageKey, "webp", heroImageWidths)} sizes="100vw" />
+      {/* Eager, not lazy: this is the first thing on screen. Empty alt
+          because it is decorative — the name over it is the content. */}
+      <img class="hero-media" src={derivativeUrl(heroImageKey, pickWidth(1920, heroImageWidths), "webp")} alt="" fetchpriority="high" />
+    </picture>
+  ) : heroLoopKey ? (
+    <video class="hero-media" src={mediaUrl(heroLoopKey)} autoplay muted loop playsinline></video>
+  ) : null}
   <div class="hero">
-    {heroImageKey ? (
-      <picture>
-        <source type="image/avif" srcset={derivativeSrcSet(heroImageKey, "avif", heroImageWidths)} sizes="100vw" />
-        <source type="image/webp" srcset={derivativeSrcSet(heroImageKey, "webp", heroImageWidths)} sizes="100vw" />
-        {/* Eager, not lazy: this is the first thing on screen. Empty alt
-            because it is decorative — the name over it is the content. */}
-        <img class="hero-media" src={derivativeUrl(heroImageKey, pickWidth(1920, heroImageWidths), "webp")} alt="" fetchpriority="high" />
-      </picture>
-    ) : heroLoopKey ? (
-      <video class="hero-media" src={mediaUrl(heroLoopKey)} autoplay muted loop playsinline></video>
-    ) : null}
     <div class="hero-copy">
       {/* No heading here: the site's <h1> is the name in the fixed header,
           which sits centred over this hero on load. A second copy of the
@@ -68,6 +71,10 @@ const ungrouped = projects.filter(
     </div>
   </div>
 
+  {/* The seam: the image keeps showing through this strip, faint at the top
+      and gone by the bottom, so the Work heading lands on solid --color-bg
+      rather than a hard photo/background edge. */}
+  <div class="hero-fade" aria-hidden="true"></div>
 </section>
 
 <section id="work" class="work-section">
@@ -180,15 +187,33 @@ const ungrouped = projects.filter(
     min-height: 100vh;
     min-height: 100svh;
   }
-  /* Absolutely filled so the photo or video covers the whole first screen
-     whatever its own proportions — the hero is sized by min-height, which
-     an in-flow child's percentage height cannot resolve against. */
+  /* A sibling of .hero rather than a child of it: inset:0 against
+     .hero-section (also position: relative) makes it span .hero AND the
+     .hero-fade strip below, so the image bleeds past the first screen
+     instead of stopping dead at the fold. */
   .hero-media {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+  /* Where the image bleed dies out. In normal flow, after .hero's 100vh box,
+     so it adds to the section's height rather than overlapping it — no
+     negative margins or z-index needed to keep it under .hero-copy. Starts at
+     the exact tint .hero-copy's scrim ends on, not transparent — .hero-copy
+     covers the whole hero at a flat 65% mix, so starting this gradient from
+     transparent instead of matching it made the image visibly brighten right
+     at the seam before darkening again. Fully opaque --color-bg by the
+     bottom so the join with .work-section (the same colour) is invisible. */
+  .hero-fade {
+    position: relative;
+    height: clamp(6rem, 20vw, 18rem);
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-bg) 65%, transparent),
+      var(--color-bg) 85%
+    );
   }
   .hero-copy {
     position: absolute;
@@ -382,9 +407,14 @@ const ungrouped = projects.filter(
     }
   }
 
+  /* Two tiles per row rather than one full-width tile: a single column made
+     each thumbnail as wide as the phone, oversized next to the rest of the
+     UI. Gap and padding shrink to match the smaller tiles. */
   @media (max-width: 45rem) {
     .grid {
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      padding: 0 0.75rem 3rem;
     }
   }
 
