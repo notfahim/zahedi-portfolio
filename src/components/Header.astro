@@ -3,6 +3,21 @@ import { getEntry } from "astro:content";
 
 const about = await getEntry("about", "site");
 const role = about!.data.role ?? "Director of Photography";
+const { directInquiryEmail, socials } = about!.data;
+
+/** Same brand marks as the footer's social row — kept small and duplicated
+ * here rather than shared, since the menu panel's version only ever needs
+ * these two icons plus email. */
+const SOCIAL_ICONS: Record<string, { path: string; color: string }> = {
+  instagram: {
+    path: "M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9.43.43.7.83.91 1.4.17.42.37 1.06.42 2.25.06 1.28.07 1.66.07 4.9s0 3.6-.07 4.9c-.05 1.2-.25 1.8-.42 2.2a3.9 3.9 0 0 1-.9 1.4c-.44.43-.84.7-1.41.91-.42.17-1.06.37-2.25.42-1.28.06-1.66.07-4.9.07s-3.6 0-4.9-.07c-1.2-.05-1.8-.25-2.2-.42a3.9 3.9 0 0 1-1.4-.9 3.9 3.9 0 0 1-.91-1.41c-.17-.42-.37-1.06-.42-2.25C2.21 15.6 2.2 15.2 2.2 12s0-3.6.07-4.9c.05-1.2.25-1.8.42-2.2.22-.6.48-1 .9-1.4.43-.43.83-.7 1.4-.91.42-.17 1.06-.37 2.25-.42C8.4 2.21 8.8 2.2 12 2.2Zm0 1.8c-3.17 0-3.5.01-4.74.07-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.4.4-.66.8-.87 1.35-.16.41-.35 1.03-.4 2.17-.06 1.23-.07 1.6-.07 4.73s.01 3.5.07 4.74c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.4.4.8.66 1.35.87.41.16 1.03.35 2.17.4 1.23.06 1.6.07 4.73.07s3.5-.01 4.74-.07c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.4-.4.66-.8.87-1.35.16-.41.35-1.03.4-2.17.06-1.23.07-1.6.07-4.73s-.01-3.5-.07-4.74c-.05-1.14-.24-1.76-.4-2.17a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.87c-.41-.16-1.03-.35-2.17-.4C15.5 4.01 15.17 4 12 4Zm0 3.06a4.94 4.94 0 1 1 0 9.88 4.94 4.94 0 0 1 0-9.88Zm0 8.15a3.2 3.2 0 1 0 0-6.41 3.2 3.2 0 0 0 0 6.41Zm6.3-8.35a1.15 1.15 0 1 1-2.3 0 1.15 1.15 0 0 1 2.3 0Z",
+    color: "#E1306C",
+  },
+  facebook: {
+    path: "M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.1 0 2.24.2 2.24.2v2.46H15.2c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.9h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z",
+    color: "#1877F2",
+  },
+};
 ---
 {/* Sits outside the header's own transform so it stays pinned to the very
     top of the window while the header's contents ride up and down. */}
@@ -45,10 +60,40 @@ const role = about!.data.role ?? "Director of Photography";
 {/* One list rather than the header's two groups: stacked in a panel there is
     no left and right to flank anything. */}
 <nav class="menu-panel" id="mobile-menu" data-menu-panel data-lenis-prevent aria-label="Sections">
-  <a href="#work" data-scroll-to>Work</a>
-  <a href="#photography" data-scroll-to>Photography</a>
-  <a href="#news" data-scroll-to>News &amp; Press</a>
-  <a href="#about" data-scroll-to>About</a>
+  <div class="menu-links">
+    <a href="#work" data-scroll-to>Work</a>
+    <a href="#photography" data-scroll-to>Photography</a>
+    <a href="#news" data-scroll-to>News &amp; Press</a>
+    <a href="#about" data-scroll-to>About</a>
+  </div>
+
+  <div class="menu-about">
+    <p class="menu-role">{role}</p>
+    <a class="menu-email" href={`mailto:${directInquiryEmail}`}>{directInquiryEmail}</a>
+    {socials && socials.length > 0 && (
+      <ul class="menu-socials">
+        {socials.map(({ label, url }) => (
+          <li>
+            <a
+              href={url}
+              aria-label={label}
+              title={label}
+              rel="me noopener noreferrer"
+              target="_blank"
+            >
+              {SOCIAL_ICONS[label.toLowerCase()] ? (
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d={SOCIAL_ICONS[label.toLowerCase()].path} fill={SOCIAL_ICONS[label.toLowerCase()].color} />
+                </svg>
+              ) : (
+                <span aria-hidden="true">{label.charAt(0)}</span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
 </nav>
 
 <script>
@@ -397,15 +442,111 @@ const role = about!.data.role ?? "Director of Photography";
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 2.5rem;
     background: color-mix(in srgb, var(--color-bg) 97%, transparent);
     backdrop-filter: blur(12px);
+    padding: 2rem 1.5rem;
+    /* A short viewport (a landscape phone) has less room than the links plus
+       the about block need — scroll rather than overlap them. */
+    overflow-y: auto;
     /* Kept in the layout so the links can animate; taken out of reach with
        inert and pointer-events while closed. */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  }
+
+  .menu-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  /* A minimal, secondary block below the links rather than a fifth nav item
+     competing with Work/Photography/News/About. */
+  .menu-about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    width: min(18rem, 80vw);
+    padding-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-fg) 14%, transparent);
+    opacity: 0;
+    transform: translateY(0.5rem);
+    transition: opacity 0.35s ease 0.24s, transform 0.35s ease 0.24s;
+  }
+
+  :global(.menu-open) .menu-about {
+    opacity: 1;
+    transform: none;
+  }
+
+  .menu-role {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .menu-email {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--color-fg);
+    text-decoration: none;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+
+  .menu-email:hover {
+    opacity: 1;
+    color: var(--color-accent);
+  }
+
+  .menu-email:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .menu-socials {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu-socials a {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-fg) 10%, transparent);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .menu-socials a:hover {
+    background: color-mix(in srgb, var(--color-fg) 18%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .menu-socials svg {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .menu-socials a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 999px;
   }
 
   :global(.menu-open) .menu-panel {
@@ -415,7 +556,7 @@ const role = about!.data.role ?? "Director of Photography";
     transition: opacity 0.3s ease, visibility 0s;
   }
 
-  .menu-panel a {
+  .menu-links a {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 8vw, 2.4rem);
     font-weight: 500;
@@ -428,25 +569,25 @@ const role = about!.data.role ?? "Director of Photography";
     transition: opacity 0.35s ease, transform 0.35s ease, color 0.2s ease;
   }
 
-  :global(.menu-open) .menu-panel a {
+  :global(.menu-open) .menu-links a {
     opacity: 1;
     transform: none;
   }
 
   /* Staggered, so the list arrives as a sequence rather than a block. */
-  :global(.menu-open) .menu-panel a:nth-child(1) { transition-delay: 0.06s; }
-  :global(.menu-open) .menu-panel a:nth-child(2) { transition-delay: 0.12s; }
-  :global(.menu-open) .menu-panel a:nth-child(3) { transition-delay: 0.18s; }
-  :global(.menu-open) .menu-panel a:nth-child(4) { transition-delay: 0.24s; }
+  :global(.menu-open) .menu-links a:nth-child(1) { transition-delay: 0.06s; }
+  :global(.menu-open) .menu-links a:nth-child(2) { transition-delay: 0.12s; }
+  :global(.menu-open) .menu-links a:nth-child(3) { transition-delay: 0.18s; }
+  :global(.menu-open) .menu-links a:nth-child(4) { transition-delay: 0.24s; }
 
-  .menu-panel a:hover,
-  .menu-panel a:focus-visible {
+  .menu-links a:hover,
+  .menu-links a:focus-visible {
     color: var(--color-accent);
   }
 
   /* The panel takes focus when it opens, so the first link shows a ring
      immediately — the site's own ring rather than the browser's blue. */
-  .menu-panel a:focus-visible {
+  .menu-links a:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 0.4rem;
     border-radius: 2px;
@@ -454,7 +595,8 @@ const role = about!.data.role ?? "Director of Photography";
 
   @media (prefers-reduced-motion: reduce) {
     .menu-panel,
-    .menu-panel a,
+    .menu-links a,
+    .menu-about,
     .menu-toggle .bar {
       transition-duration: 0.01ms;
     }

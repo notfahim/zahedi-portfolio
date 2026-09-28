@@ -18,6 +18,16 @@ const ICONS: Record<string, string> = {
     "M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 2v.5l-8 5.25L4 6.5V6h16ZM4 18V8.84l7.45 4.9a1 1 0 0 0 1.1 0L20 8.84V18H4Z",
 };
 
+/**
+ * Real per-platform brand colour, rendered instead of the page's monochrome
+ * palette. `email` is left out — it has no brand colour, so it keeps the
+ * neutral currentColor fill the button already gives it.
+ */
+const BRAND_COLORS: Record<string, string> = {
+  instagram: "#E1306C",
+  facebook: "#1877F2",
+};
+
 const buttons = [
   ...(socials ?? []).map((s) => ({ label: s.label, url: s.url, external: true })),
   { label: "Email", url: `mailto:${directInquiryEmail}`, external: false },
@@ -37,7 +47,10 @@ const buttons = [
         >
           {ICONS[label.toLowerCase()] ? (
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d={ICONS[label.toLowerCase()]} />
+              <path
+                d={ICONS[label.toLowerCase()]}
+                fill={BRAND_COLORS[label.toLowerCase()] ?? "currentColor"}
+              />
             </svg>
           ) : (
             <span aria-hidden="true">{label.charAt(0)}</span>
@@ -143,23 +156,24 @@ const buttons = [
   .social-button {
     display: grid;
     place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
     border-radius: 999px;
     background: color-mix(in srgb, var(--color-fg) 10%, transparent);
     color: var(--color-fg);
-    transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
   }
 
   .social-button svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    fill: currentColor;
+    width: 1.5rem;
+    height: 1.5rem;
   }
 
+  /* Icon paths carry their own brand colour now, so hover only lifts the
+     button rather than inverting it to the accent colour — that swap made
+     sense for a single-tone icon but would fight a colourful one. */
   .site-footer a.social-button:hover {
-    background: var(--color-accent);
-    color: var(--color-bg);
+    background: color-mix(in srgb, var(--color-fg) 18%, transparent);
     transform: translateY(-2px);
   }
 
