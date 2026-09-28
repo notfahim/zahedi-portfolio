@@ -53,7 +53,7 @@ function initHeaderPush(lenis: Lenis): void {
     a.getBoundingClientRect().top <= b.getBoundingClientRect().top ? a : b
   );
 
-  const GAP = 24; // px kept between the header contents and the buttons
+  const GAP = 40; // px kept between the header contents and the buttons
   let openingScale = readOpeningScale(header);
   let restY = 0;
   let halfHeight = 0;
@@ -99,9 +99,18 @@ function initHeaderPush(lenis: Lenis): void {
     barHeight = header!.getBoundingClientRect().height;
     // Offset that centres the contents in the viewport.
     restY = window.innerHeight / 2 - barHeight / 2;
-    // Half the height the contents occupy while large.
+    // Half the height the contents occupy while large. .role sits under
+    // .name with position: absolute (so it can centre independently of the
+    // name's width), which means it contributes nothing to title.offsetHeight
+    // even though it is drawn — and scaled up right along with the name, since
+    // it inherits .title-block's transform. Left out, halfHeight undershot the
+    // large title's true footprint by the role line's height, so the "Work"
+    // heading below was let to sit closer than GAP actually intended, right
+    // up against (or under) the role text.
+    const role = title?.querySelector<HTMLElement>(".role");
+    const roleHeight = role ? role.offsetHeight + parseFloat(getComputedStyle(role).marginTop || "0") : 0;
     const natural = inner!.getBoundingClientRect().height;
-    const titleHeight = title ? title.offsetHeight : natural;
+    const titleHeight = title ? title.offsetHeight + roleHeight : natural;
     halfHeight = Math.max(natural, titleHeight * openingScale) / 2;
   }
 
