@@ -53,7 +53,7 @@ nothing can be verified without:
 | Per-project credits — the set depends on the category (see `asset-checklist.md`) | `src/content/work.json` |
 | Bio, representation contacts, location | `src/content/about.json` |
 | Portrait photo + its alt text | R2, `portraitKey`/`portraitAlt` in `about.json` |
-| Press kit PDF | R2, `pressKitKey` in `about.json` |
+| Quotation PDF | R2, `quotationKey` in `about.json` |
 | Favicon, and an Open Graph image if you want link previews | `public/`, referenced from `BaseLayout.astro` |
 | Real domain + media subdomain | `vercel.json` CSP **and** `PUBLIC_MEDIA_BASE_URL` |
 
@@ -67,7 +67,7 @@ but you do have to change both.
   The code appends `-<width>.<format>` itself. A trailing extension here now
   fails the build with an explanatory message.
 - **Literal keys** (with extension): `hoverPreviewKey`, `heroLoopKey`,
-  `pressKitKey`. Used exactly as written.
+  `quotationKey`. Used exactly as written.
 
 ---
 

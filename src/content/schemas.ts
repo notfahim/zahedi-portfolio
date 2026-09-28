@@ -10,7 +10,7 @@ import { WORK_CATEGORY_IDS } from "../lib/work-categories";
  * - base keys (`thumbnailKey`, `imageKey`, `portraitKey`, `posterKey`):
  *   `buildDerivativeKey()` appends `/<width>.<format>`, so they must not carry
  *   an extension — `"work/foo-thumb.webp"` would 404 every derivative.
- * - literal keys (`videoKey`, `hoverPreviewKey`, `pressKitKey`, `heroLoopKey`):
+ * - literal keys (`videoKey`, `hoverPreviewKey`, `quotationKey`, `heroLoopKey`):
  *   used verbatim by `mediaUrl()` and legitimately carry a real extension.
  */
 
@@ -172,8 +172,12 @@ export const aboutSchema = z.object({
   socials: z
     .array(z.object({ label: z.string(), url: z.string().url() }))
     .optional(),
-  /** Without it no button renders, rather than a link to a missing PDF. */
-  pressKitKey: z.string().optional(),
+  /**
+   * The rate card / quotation document. A raw R2 key, uploaded by hand (it's
+   * a one-off PDF, not something the image pipeline generates derivatives
+   * for). Without it no button renders, rather than a link to a missing PDF.
+   */
+  quotationKey: z.string().optional(),
   /**
    * Landing-page background. A still (`heroImageKey`, a base key) takes
    * priority over a video loop (`heroLoopKey`, a literal `.mp4` key). With

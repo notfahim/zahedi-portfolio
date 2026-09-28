@@ -4,7 +4,7 @@ import { mediaUrl, derivativeUrl, derivativeSrcSet, pickWidth } from "../../lib/
 import { whatsappUrl } from "../../lib/contact";
 
 const about = await getEntry("about", "site");
-const { bio, representation, directInquiryEmail, whatsappNumber, location, pressKitKey, portraitKey, portraitWidths, portraitAlt } = about!.data;
+const { bio, representation, directInquiryEmail, whatsappNumber, location, quotationKey, portraitKey, portraitWidths, portraitAlt } = about!.data;
 ---
 <section id="about" class="about-section">
   <div class="portrait" data-media data-reveal>
@@ -46,9 +46,9 @@ const { bio, representation, directInquiryEmail, whatsappNumber, location, press
       <li>Location: {location}</li>
     </ul>
 
-{pressKitKey && (
-      <a class="press-kit" href={mediaUrl(pressKitKey)} target="_blank" rel="noopener noreferrer">
-        📄 Download Press Kit / CV (PDF)
+{quotationKey && (
+      <a class="quotation" href={mediaUrl(quotationKey)} target="_blank" rel="noopener noreferrer">
+        <span class="quotation-icon" aria-hidden="true">↗</span> Request a Quotation (PDF)
       </a>
     )}
   </div>
@@ -63,11 +63,25 @@ const { bio, representation, directInquiryEmail, whatsappNumber, location, press
     max-width: 72rem;
     margin: 0 auto;
   }
-  /* Only as tall as the photograph. As a grid item it stretched to the row's
-     height while the image kept its own, and the difference showed up as a
-     band of the [data-media] skeleton background under the picture. */
+  /* Stretched to the row's height (the grid's default), matching .copy —
+     the portrait is now exactly as tall as the text beside it. The picture
+     is absolutely positioned inside so it can cover that height without
+     distorting; .portrait contributes no intrinsic height of its own, so
+     the row's height comes from .copy alone rather than the two fighting
+     over it. */
   .portrait {
-    align-self: start;
+    position: relative;
+  }
+  .portrait picture {
+    display: block;
+    height: 100%;
+  }
+  .portrait img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .role {
     color: var(--color-muted);
@@ -76,13 +90,44 @@ const { bio, representation, directInquiryEmail, whatsappNumber, location, press
     list-style: none;
     padding: 0;
   }
-  .press-kit {
-    display: inline-block;
+  /* Same pill-button language as .reel-button and .back-to-top elsewhere on
+     the site: uppercase, letter-spaced, a soft fg-tinted pill that lightens
+     and lifts on hover — a button, not a plain text link. */
+  .quotation {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
     margin-top: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-fg);
+    background: color-mix(in srgb, var(--color-fg) 12%, transparent);
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+  .quotation:hover {
+    background: color-mix(in srgb, var(--color-fg) 20%, transparent);
+    transform: translateY(-2px);
+  }
+  .quotation:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .quotation-icon {
+    font-size: 0.7rem;
   }
   @media (max-width: 48rem) {
     .about-section {
       grid-template-columns: 1fr;
+    }
+    /* Stacked layout: .portrait no longer shares a row with .copy, so it
+       can't borrow the text's height. Fall back to a fixed aspect ratio. */
+    .portrait {
+      aspect-ratio: 4 / 5;
     }
   }
 </style>

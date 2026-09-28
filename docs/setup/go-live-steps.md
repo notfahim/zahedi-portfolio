@@ -103,7 +103,7 @@ Two things are true throughout:
       Rules sound like they'd fit, but neither has a Block action — they only
       control caching and header rewriting. Scrape Shield's one-click Hotlink
       Protection toggle *does* block, but only for image content types, which
-      would leave your video clips and press-kit PDF unprotected.
+      would leave your video clips and quotation PDF unprotected.
 
       **What this does and doesn't buy you.** It stops casual embedding on
       other websites, which is the common case. It does not stop anyone who
@@ -210,7 +210,7 @@ zahediportfolio/
     music-video/
   photography/      neon-shadows/{640,1280,1920,2560}.{avif,webp}
   news/             <film>-poster/…
-  about/            reel.mp4, portrait/…, hero/…, press-kit.pdf
+  about/            reel.mp4, portrait/…, hero/…, quotation.pdf
 ```
 
 Each image is its own folder of 8 objects — four widths in two formats — so a
@@ -427,8 +427,8 @@ fill in.
         set.
       - Video: a silent `.mp4` uploaded by hand, `heroLoopKey` **with** the
         extension.
-- [ ] Press kit PDF (optional): upload by hand and add `pressKitKey` with its
-      extension. With no `pressKitKey`, no download button renders.
+- [ ] Quotation PDF (optional): upload by hand and add `quotationKey` with its
+      extension. With no `quotationKey`, no download button renders.
 - [ ] Footer social links — add a `socials` array. Omit it and the footer shows
       no social links at all, which is fine:
       ```json
@@ -491,7 +491,7 @@ no Awards/Nominations headings; an empty `news.json`, no Press column.
 | Field | Shape | Example |
 |---|---|---|
 | `thumbnailKey`, `imageKey`, `portraitKey`, `heroImageKey` | **no** extension | `work/commercial/silent-sprint-thumb` |
-| `hoverPreviewKey`, `heroLoopKey`, `pressKitKey`, `videoKey`, `reelVideoKey` | **with** extension | `work/commercial/silent-sprint-preview.mp4` |
+| `hoverPreviewKey`, `heroLoopKey`, `quotationKey`, `videoKey`, `reelVideoKey` | **with** extension | `work/commercial/silent-sprint-preview.mp4` |
 
 Rule of thumb: if `publish-image` made it, no extension. If you dragged the
 file into the bucket yourself, keep its extension. The build rejects the wrong
@@ -637,7 +637,7 @@ in your shell, so it runs locally only — never in a deploy.
 - [ ] **Showreel.** `reelVideoKey` is unset, so no "Play Reel" button renders
       on the hero. Publish one with
       `npm run publish-video -- about reel ~/Movies/reel.mov` if you want it.
-- [ ] **Press kit.** `pressKitKey` is unset, so no download button renders.
+- [ ] **Quotation.** `quotationKey` is unset, so no download button renders.
       Add the key back to `about.json` once the PDF is in the bucket.
 - [ ] **Open Graph image** for link previews, referenced from `BaseLayout`.
       Without one, a shared link shows a blank card.

@@ -18,7 +18,7 @@ Four sections, in nav order: **Work → Photography → News & Press → About**
 
 - No contact form, no newsletter signup, no other viewer-submitted data. (The
   wireframes originally sketched both; both are explicitly cut. About is pure
-  static content — bio, representation contacts, press-kit link.)
+  static content — bio, representation contacts, quotation link.)
 - No CMS or admin UI. Content changes are a hand-edited JSON commit plus a
   locally-run image-publish script.
 - No true DRM on media. Security measures below are deterrents and access
@@ -89,7 +89,7 @@ one collection entry (Work's hero loop and reel, About's own portrait) —
 `"site"`-keyed file:
 ```
 bio (rich text/markdown string), representation[] (label + contact string),
-directInquiryEmail, location, pressKitKey (R2 key, PDF),
+directInquiryEmail, location, quotationKey (R2 key, PDF),
 heroLoopKey (R2 key, silent hero loop video — Work section),
 portraitKey (R2 key, extensionless base key — About section portrait),
 portraitAlt, reelVideoKey, reelTitle (both optional as a

@@ -52,7 +52,7 @@ export function expectedMediaKeys({ work = [], photography = [], about, recognit
     if (site.heroImageKey) add(expected, derivativesOf(site.heroImageKey, site.heroImageWidths), "about.json");
     if (site.heroLoopKey) add(expected, [site.heroLoopKey], "about.json");
     if (site.reelVideoKey) add(expected, [site.reelVideoKey], "about.json");
-    if (site.pressKitKey) add(expected, [site.pressKitKey], "about.json");
+    if (site.quotationKey) add(expected, [site.quotationKey], "about.json");
   }
 
   const film = recognition?.site?.film;

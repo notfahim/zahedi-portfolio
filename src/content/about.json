@@ -8,14 +8,10 @@
         "contact": "zahedishams@gmail.com"
       }
     ],
+    "quotationKey": "about/quotation.pdf",
     "directInquiryEmail": "zahedishams@gmail.com",
     "location": "Available Worldwide",
     "heroImageKey": "about/hero",
-    "heroImageWidths": [
-      640,
-      1280,
-      1920
-    ],
     "portraitKey": "about/portrait",
     "portraitWidths": [
       640,

@@ -76,9 +76,9 @@ are two incompatible shapes and the schema now rejects the wrong one:
   a base key that already ends in `.webp`/`.jpg`/etc. produces a key that
   was never uploaded and 404s.
 - **Literal keys** — `hoverPreviewKey`, `videoKey` (work.json),
-  `pressKitKey`, `heroLoopKey`, `reelVideoKey` (about.json). These are used
+  `quotationKey`, `heroLoopKey`, `reelVideoKey` (about.json). These are used
   exactly as written and **must** carry their real file extension, e.g.
-  `"work/commercial/nike-silent-sprint-preview.mp4"` or `"about/press-kit.pdf"`.
+  `"work/commercial/nike-silent-sprint-preview.mp4"` or `"about/quotation.pdf"`.
 
 When in doubt: if `publish-image.mjs` generated it, it's a base key with no
 extension; if it's a single file you uploaded directly (a video clip, a

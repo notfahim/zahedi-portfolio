@@ -32,7 +32,7 @@ env vars each step produces.
    this — they control cache behavior and URL/header rewriting respectively,
    and neither offers a Block action. Cloudflare's Scrape Shield → Hotlink
    Protection toggle is a simpler alternative but covers image content types
-   only, so it would leave the R2-hosted video clips and the press-kit PDF
+   only, so it would leave the R2-hosted video clips and the quotation PDF
    unprotected.
 5. Record for local use (Task 15's CLI reads these from your shell
    environment, NOT from `.env` — they must never be committed or
