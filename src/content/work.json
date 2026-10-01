@@ -15,6 +15,22 @@
     ]
   },
   {
+    "id": "bafufeapplebox",
+    "slug": "bafufeapplebox",
+    "title": "Bafufe x BGMEA",
+    "category": "commercial",
+    "year": 2026,
+    "client": "Applebox",
+    "director": "Moztoba Zahid",
+    "videoKey": "work/commercial/bafufeapplebox.mp4",
+    "thumbnailKey": "work/commercial/bafufeapplebox-thumb",
+    "thumbnailWidths": [
+      640,
+      1280,
+      1920
+    ]
+  },
+  {
     "id": "003-city-bank-google-pay",
     "slug": "003-city-bank-google-pay",
     "title": "City Bank Google Pay",
@@ -225,7 +241,7 @@
     "category": "commercial",
     "year": 2026,
     "client": "Samsung Bangladesh",
-    "director": "Moztoba",
+    "director": "Moztoba Zahid",
     "videoKey": "work/commercial/applebox.mp4",
     "thumbnailKey": "work/commercial/applebox-thumb",
     "thumbnailWidths": [
@@ -327,6 +343,22 @@
     "producer": "",
     "videoKey": "work/commercial/006-1.mp4",
     "thumbnailKey": "work/commercial/006-1-thumb",
+    "thumbnailWidths": [
+      640,
+      1280,
+      1920
+    ]
+  },
+  {
+    "id": "pranshadmasala",
+    "slug": "pranshadmasala",
+    "title": "Pran Shad ar Masala TVC",
+    "category": "commercial",
+    "year": 2026,
+    "client": "PRAN-RFL Group",
+    "director": "Md Inhaz Uddin Shoyab",
+    "videoKey": "work/commercial/pranshadmasala.mp4",
+    "thumbnailKey": "work/commercial/pranshadmasala-thumb",
     "thumbnailWidths": [
       640,
       1280,
