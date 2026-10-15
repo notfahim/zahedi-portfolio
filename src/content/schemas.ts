@@ -49,6 +49,8 @@ export const workEntrySchema = z.object({
   runtime: z.string().optional(),
   artist: z.string().optional(),
   year: z.number().int().optional(),
+  /** A single award to highlight in the project viewer. */
+  award: z.string().optional(),
   /** Optional: `publish-video` makes one from a video frame. */
   thumbnailKey: baseKey.optional(),
   /**

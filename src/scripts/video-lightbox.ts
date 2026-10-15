@@ -49,6 +49,7 @@ export interface ProjectFields {
   projectProducer?: string;
   projectRuntime?: string;
   projectArtist?: string;
+  projectAward?: string;
 }
 
 /** One row of the lightbox's credit block. */
@@ -93,6 +94,8 @@ export function buildDetails(
     add(CREDIT_LABELS[field], f[datasetKey(field)]);
   }
   add("Year", f.projectYear);
+  // A highlight rather than a credit: a lead row, styled by `.detail-lead`.
+  if (f.projectAward) rows.push({ label: "", value: `★ ${f.projectAward}` });
 
   return { title: f.projectTitle ?? "", rows };
 }

@@ -14,13 +14,14 @@ interface Props {
   director?: string;
   producer?: string;
   runtime?: string;
+  award?: string;
   artist?: string;
   thumbnailKey?: string;
   thumbnailWidths?: number[];
   hoverPreviewKey?: string;
   videoKey?: string;
 }
-const { slug, title, category, year, client, director, producer, runtime, artist, thumbnailKey, thumbnailWidths, hoverPreviewKey, videoKey } = Astro.props;
+const { slug, title, category, year, client, director, producer, runtime, award, artist, thumbnailKey, thumbnailWidths, hoverPreviewKey, videoKey } = Astro.props;
 /**
  * The slug is the only thing a project always has, so it stands in for a title
  * not yet written — an untitled card would be a thumbnail with nothing under it.
@@ -43,6 +44,7 @@ const heading = title ?? slug;
     data-project-producer={producer}
     data-project-runtime={runtime}
     data-project-artist={artist}
+    data-project-award={award}
   >
     <div class="thumb-wrap" data-media>
       {thumbnailKey && (
