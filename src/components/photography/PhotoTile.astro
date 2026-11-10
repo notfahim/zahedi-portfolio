@@ -11,12 +11,18 @@ interface Props {
   camera?: string;
   rowSpan: number;
   widths?: number[];
+  /** Position on the wall, e.g. "Photograph 3 of 27". */
+  label: string;
 }
-const { imageKey, width, height, caption, location, year, camera, rowSpan, widths } = Astro.props;
+const { imageKey, width, height, caption, location, year, camera, rowSpan, widths, label: position } = Astro.props;
+// The link needs a name even when the caption is blank, or a screen reader
+// announces only the image URL.
+const label = [position, caption, location, year].filter(Boolean).join(", ");
 ---
 <a
   href={derivativeUrl(imageKey, pickWidth(2560, widths), "webp")}
   class="photo-tile"
+  aria-label={label}
   style={`--span: ${rowSpan}; --ar: ${width} / ${height};`}
   data-pswp-width={width}
   data-pswp-height={height}

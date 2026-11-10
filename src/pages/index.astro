@@ -9,8 +9,9 @@ import AboutSection from "../components/sections/AboutSection.astro";
 import VideoLightbox from "../components/lightbox/VideoLightbox.astro";
 ---
 <BaseLayout title="Zahedi Shams — Director of Photography">
+  <a class="skip-link" href="#main">Skip to content</a>
   <Header />
-  <main>
+  <main id="main" tabindex="-1">
     <WorkSection />
     <PhotographySection />
     <NewsSection />

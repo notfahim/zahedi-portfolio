@@ -16,6 +16,12 @@ import "../styles/global.css";
         visible and then hidden again. */}
     <script is:inline>
       document.documentElement.classList.add("js-pending");
+      // If the module scripts never arrive (failed or stalled download), drop
+      // the hidden starting state so the page is never stuck blank.
+      setTimeout(() => {
+        const root = document.documentElement;
+        if (!root.classList.contains("is-ready")) root.classList.remove("js-pending");
+      }, 3000);
       // Right-click on an image only. Anywhere else keeps its menu, so
       // Back, Reload and Inspect still work.
       document.addEventListener("contextmenu", (e) => {

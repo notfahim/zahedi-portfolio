@@ -154,7 +154,11 @@ function initHeaderPush(lenis: Lenis): void {
 
 /** Start Lenis and everything driven off the scroll position. */
 export function initScrollEngine(): void {
+  // Lenis stays on with motion turned down (the header and nav read its
+  // position) but stops smoothing the wheel and jumps instead of gliding.
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const lenis = new Lenis({
+    smoothWheel: !reduced,
     // Lenis's default easing settles slowly enough to read as lag — a wheel
     // tick kept travelling after the gesture stopped, so a second tick felt
     // like it did nothing. A higher lerp tracks the wheel closely while
@@ -265,7 +269,7 @@ export function initScrollEngine(): void {
   // panel centring itself as it opens). Routed through Lenis for the same
   // reason as everything else here: it owns the scroll position.
   document.addEventListener("scroll:to", (event) => {
-    lenis.scrollTo((event as CustomEvent<number>).detail);
+    lenis.scrollTo((event as CustomEvent<number>).detail, { immediate: reduced });
   });
 
   // Smooth anchor scrolling for anything marked data-scroll-to (header nav
@@ -279,7 +283,7 @@ export function initScrollEngine(): void {
       event.preventDefault();
       // Lenis reads the target's scroll-margin-top itself, which is how the
       // Work group headings clear the fixed header and the sticky bar.
-      lenis.scrollTo(target as HTMLElement);
+      lenis.scrollTo(target as HTMLElement, { immediate: reduced });
     });
   });
 }

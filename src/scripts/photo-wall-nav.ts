@@ -41,8 +41,13 @@ export function initPhotoWallNav(): void {
   /** Show each arrow only while it has somewhere to go. */
   function sync() {
     const { canScrollLeft, canScrollRight } = arrowStateFor(viewport!);
+    // Hiding the focused arrow would drop keyboard focus to <body>; hand it
+    // to the other arrow, which by then has somewhere to go.
+    const focused = document.activeElement;
     previous!.hidden = !canScrollLeft;
     next!.hidden = !canScrollRight;
+    if (focused === previous && previous!.hidden && !next!.hidden) next!.focus();
+    if (focused === next && next!.hidden && !previous!.hidden) previous!.focus();
   }
 
   /** Scroll the wall one page in `direction`. */

@@ -65,6 +65,32 @@ html.is-ready body {
   transition: opacity 0.5s ease;
 }
 
+/* ---- Skip link ------------------------------------------------------- */
+
+/* Off-screen until a keyboard user tabs to it, then above the header. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  padding: 0.6rem 1rem;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font: 600 0.875rem/1 var(--font-body);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+main:focus {
+  outline: none;
+}
+
 /* ---- Reveal on scroll ------------------------------------------------ */
 
 [data-reveal] {

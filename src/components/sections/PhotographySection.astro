@@ -37,7 +37,7 @@ function rowSpanFor(width: number, height: number): number {
     </button>
     <div class="photo-wall-viewport" data-photo-wall data-lenis-prevent>
     <div class="photo-wall-track" data-photo-wall-track>
-      {photos.map((photo) => (
+      {photos.map((photo, i) => (
         <PhotoTile
           imageKey={photo.data.imageKey}
           width={photo.data.width}
@@ -48,6 +48,7 @@ function rowSpanFor(width: number, height: number): number {
           camera={photo.data.camera}
           rowSpan={rowSpanFor(photo.data.width, photo.data.height)}
           widths={photo.data.widths}
+          label={`Photograph ${i + 1} of ${photos.length}`}
         />
       ))}
       </div>
